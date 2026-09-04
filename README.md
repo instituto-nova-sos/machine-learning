@@ -366,32 +366,192 @@ Continue em [Otimização e gradiente](otimizacao-e-gradiente/README.md).
 
 ## 8. Projeto progressivo: preço de imóveis
 
-A trilha implementa uma regressão didática de área para preço. O dataset é **sintético e
-determinístico**: serve para estudar o fluxo computacional, não como evidência sobre o mercado
-imobiliário.
+A trilha implementa, passo a passo, uma regressão didática que tenta responder à pergunta:
+
+> **Dada somente a área de um imóvel em metros quadrados, qual preço o modelo estima?**
+
+Esse é um problema de **aprendizagem supervisionada** porque cada exemplo já contém uma entrada e
+a resposta correspondente:
+
+| Papel | Coluna | Exemplo | Significado |
+|---|---|---:|---|
+| atributo de entrada (`x`) | `area_m2` | `85` | informação entregue ao modelo |
+| alvo conhecido (`y`) | `preco_brl` | `350000` | resposta usada para calcular o erro |
+| previsão (`ŷ`) | não é uma coluna original | `350,577.02` | resposta calculada pelo modelo |
+
+O dataset é **sintético e determinístico**: o script cria 120 exemplos com a mesma semente para
+que toda a turma possa reproduzir a atividade. Os valores foram construídos para ter uma tendência
+linear com variação aleatória. Eles servem para estudar o fluxo computacional e **não constituem
+evidência sobre o mercado imobiliário**.
+
+### O que exatamente será treinado?
+
+Usaremos uma regressão linear com um atributo:
+
+```text
+preço estimado = peso × área + viés
+              ŷ = w × x + b
+```
+
+O formato da função é escolhido por nós. O treinamento não inventa essa fórmula: ele procura
+valores adequados para seus dois **parâmetros**, `w` e `b`.
+
+- o **peso `w`** é quanto a estimativa varia quando a área aumenta 1 m²;
+- o **viés `b`** é onde a reta cruza o eixo do preço e permite deslocá-la para cima ou para baixo;
+- a **taxa de aprendizado `0.05`** e as **2.000 épocas** são hiperparâmetros definidos antes do
+  treinamento, não valores aprendidos pelo modelo.
+
+Cada época executa este ciclo sobre os 96 exemplos de treino:
+
+1. calcula uma previsão `ŷ = wx + b` para cada área;
+2. compara cada previsão com o preço-alvo;
+3. resume os erros por meio do MSE;
+4. calcula o gradiente do MSE em relação a `w` e `b`;
+5. move os parâmetros um pequeno passo na direção que reduz a perda.
+
+```text
+w_novo = w_atual - taxa_de_aprendizado × gradiente_do_peso
+b_novo = b_atual - taxa_de_aprendizado × gradiente_do_viés
+```
+
+Portanto, **treinar** significa repetir previsões, medir erros e ajustar `w` e `b`. O gradiente não
+é o modelo nem a previsão: ele indica como alterar os parâmetros para tentar diminuir o erro.
+
+### Visão geral do experimento
 
 ```mermaid
 flowchart LR
-    G[Gerar CSV] --> D[Dividir treino e teste]
-    D --> S[Ajustar escala no treino]
-    S --> T[Treinar regressão]
-    T --> A[Salvar JSON]
-    A --> E[Avaliar no teste]
-    A --> P[Prever nova área]
+    G[Gerar 120 exemplos] --> D[Separar 96 para treino e 24 para teste]
+    D --> S[Padronizar áreas usando somente o treino]
+    S --> T[Ajustar peso e viés por gradiente descendente]
+    T --> A[Salvar peso e viés em JSON]
+    A --> E[Medir RMSE nos 24 exemplos preservados]
+    A --> P[Estimar o preço para uma nova área]
 ```
 
-Após preparar o ambiente, execute:
+Os mesmos índices são selecionados em toda execução porque a partição também usa uma semente
+fixa. O conjunto de teste fica fora do treinamento: seus preços não participam do cálculo dos
+parâmetros.
+
+### Passo 1 — gerar e reconhecer os dados
+
+Após [preparar o ambiente](#10-preparação-do-ambiente), execute na raiz do repositório:
 
 ```bash
 python scripts/gerar_dados_imoveis.py
+```
+
+Saída esperada:
+
+```text
+Dataset sintético gerado em data/processed/imoveis.csv (semente 42, 120 exemplos).
+Ele não representa preços reais nem deve orientar decisões financeiras.
+```
+
+Abra `data/processed/imoveis.csv` e identifique as duas colunas antes de continuar. Cada linha é um
+exemplo conhecido que relaciona uma área a um preço sintético.
+
+### Passo 2 — treinar a regressão linear
+
+```bash
 python -m sos_ml.train --data data/processed/imoveis.csv --output artifacts/modelo_linear.json
+```
+
+Durante esse comando, o programa:
+
+1. separa 96 exemplos para treino e preserva 24 para teste;
+2. calcula média e desvio das áreas usando **somente o treino**;
+3. padroniza as áreas de treino para tornar o gradiente descendente numericamente mais estável;
+4. começa com `w = 0` e `b = 0` e realiza 2.000 atualizações em lote;
+5. converte a reta aprendida de volta para as unidades compreensíveis de m² e reais;
+6. salva apenas o tipo do modelo, o peso e o viés no arquivo JSON.
+
+Saída aproximada:
+
+```text
+Treinamento concluído em 96 exemplos. MSE final: 326443368.77 BRL²
+Parâmetros: peso=3213.79, viés=77404.87
+Artefato salvo em: artifacts/modelo_linear.json
+```
+
+O MSE aparece em `BRL²` porque eleva os resíduos ao quadrado. Seu valor parece grande e não
+deve ser lido diretamente como “reais de erro”. Os parâmetros formam esta reta aproximada:
+
+```text
+preço estimado = 3213.79 × área + 77404.87
+```
+
+Aqui, o peso diz que a reta aumenta cerca de R$ 3.213,79 por m². Isso descreve o padrão sintético
+aprendido; não é uma estimativa válida de valorização no mundo real. O viés é necessário para
+posicionar a reta, mas interpretá-lo como preço real de um imóvel de 0 m² seria uma extrapolação
+sem sentido prático.
+
+### Passo 3 — avaliar em exemplos não usados no treinamento
+
+```bash
 python -m sos_ml.evaluate --data data/processed/imoveis.csv --model artifacts/modelo_linear.json
+```
+
+Saída aproximada:
+
+```text
+Avaliação em 24 exemplos preservados
+RMSE: 18603.65 BRL
+A métrica não prova utilidade, causalidade, justiça nem desempenho futuro.
+```
+
+O RMSE volta à unidade original do alvo. Neste teste controlado, ele indica uma distância
+quadrática típica de aproximadamente R$ 18,6 mil entre previsões e alvos sintéticos. Ele não quer
+dizer que toda previsão erra exatamente esse valor e não mede o mercado real.
+
+### Passo 4 — usar os parâmetros aprendidos em uma nova entrada
+
+```bash
 python -m sos_ml.predict --model artifacts/modelo_linear.json --area 85
+```
+
+Saída aproximada:
+
+```text
+Estimativa didática: R$ 350,577.02
+Não use esta saída como avaliação real de imóvel.
+```
+
+O comando carrega `peso` e `vies` do JSON e faz somente uma **inferência** — não há novo
+treinamento:
+
+```text
+ŷ = 3213.79 × 85 + 77404.87 ≈ 350,577.02
+```
+
+Treinamento é o processo de encontrar parâmetros a partir de exemplos com respostas conhecidas.
+Inferência é usar os parâmetros já aprendidos para calcular uma previsão para uma entrada.
+
+### Passo 5 — enxergar a reta e a perda
+
+```bash
 python scripts/visualizar_regressao.py
 ```
 
-O fluxo divide os dados antes de ajustar a escala. Depois do treino, converte os parâmetros do
-espaço padronizado para m² e reais antes de serializar o JSON legível.
+O arquivo `artifacts/regressao_e_perda.png` contém dois gráficos:
+
+- **Preço em função da área:** cada ponto é um exemplo de treino; a linha vermelha é a função
+  aprendida. A distância vertical entre um ponto e a reta é seu resíduo.
+- **Perda durante o treinamento:** mostra o MSE após cada época. A queda indica que as atualizações
+  de `w` e `b` estão reduzindo o erro de treino; quando a curva se estabiliza, as atualizações já
+  produzem pouca melhora.
+
+A queda da perda de treino demonstra que o otimizador ajustou a reta aos exemplos usados. Isso,
+por si só, não demonstra generalização, causalidade ou utilidade. Por essa razão medimos
+separadamente o RMSE no conjunto de teste.
+
+Ao final, tente explicar sem consultar o código:
+
+1. quais são `x`, `y`, `ŷ`, `w` e `b` neste problema;
+2. por que o teste não participa do treinamento;
+3. como o gradiente modifica o peso e o viés;
+4. por que MSE de treino e RMSE de teste têm unidades e papéis diferentes;
+5. por que a previsão para 85 m² é uma saída didática, não uma avaliação imobiliária.
 
 Consulte também [dados](data/README.md) e [artefatos](artifacts/README.md).
 
