@@ -377,7 +377,7 @@ a resposta correspondente:
 |---|---|---:|---|
 | atributo de entrada (`x`) | `area_m2` | `85` | informação entregue ao modelo |
 | alvo conhecido (`y`) | `preco_brl` | `350000` | resposta usada para calcular o erro |
-| previsão (`ŷ`) | não é uma coluna original | `350577.02` | resposta calculada pelo modelo |
+| previsão (`ŷ`) | não é uma coluna original | `350,577.02` | resposta calculada pelo modelo |
 
 O dataset é **sintético e determinístico**: o script cria 120 exemplos com a mesma semente para
 que toda a turma possa reproduzir a atividade. Os valores foram construídos para ter uma tendência
@@ -474,11 +474,11 @@ Parâmetros: peso=3213.79, viés=77404.87
 Artefato salvo em: artifacts/modelo_linear.json
 ```
 
-O MSE aparece em `BRL²` porque ele eleva os resíduos ao quadrado. Seu valor parece grande e não
+O MSE aparece em `BRL²` porque eleva os resíduos ao quadrado. Seu valor parece grande e não
 deve ser lido diretamente como “reais de erro”. Os parâmetros formam esta reta aproximada:
 
 ```text
-preço estimado = 3213,79 × área + 77404,87
+preço estimado = 3213.79 × área + 77404.87
 ```
 
 Aqui, o peso diz que a reta aumenta cerca de R$ 3.213,79 por m². Isso descreve o padrão sintético
@@ -521,7 +521,7 @@ O comando carrega `peso` e `vies` do JSON e faz somente uma **inferência** — 
 treinamento:
 
 ```text
-ŷ = 3213,79 × 85 + 77404,87 ≈ 350577,02
+ŷ = 3213.79 × 85 + 77404.87 ≈ 350,577.02
 ```
 
 Treinamento é o processo de encontrar parâmetros a partir de exemplos com respostas conhecidas.
@@ -541,9 +541,9 @@ O arquivo `artifacts/regressao_e_perda.png` contém dois gráficos:
   de `w` e `b` estão reduzindo o erro de treino; quando a curva se estabiliza, as atualizações já
   produzem pouca melhora.
 
-A perda de treino cair demonstra que o otimizador ajustou a reta aos exemplos usados. Isso, por si
-só, não demonstra generalização, causalidade ou utilidade. Por essa razão medimos separadamente o
-RMSE no conjunto de teste.
+A queda da perda de treino demonstra que o otimizador ajustou a reta aos exemplos usados. Isso,
+por si só, não demonstra generalização, causalidade ou utilidade. Por essa razão medimos
+separadamente o RMSE no conjunto de teste.
 
 Ao final, tente explicar sem consultar o código:
 
