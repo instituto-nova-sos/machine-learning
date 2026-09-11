@@ -89,6 +89,41 @@ Um item só muda para **testado** depois de sua execução ser registrada neste 
 13. Código, configurações, dados e artefatos usam caminhos relativos à raiz. A `.venv` contém
     caminhos absolutos gerados pelo Python, fica fora do Git e deve ser recriada após clone ou
     mudança de diretório.
+14. Todo código novo deve funcionar também como documentação didática, seguindo o padrão iniciado
+    em `generate_housing_data()` de `sos_ml.data`. Docstrings e comentários devem ser escritos com
+    a máxima profundidade útil, para permitir que estudantes estudem o material de forma autônoma,
+    sem depender da explicação de um instrutor.
+
+## Documentação didática no código
+
+Ao criar ou alterar código, documente não apenas **o que** ele executa, mas também **por que** cada
+decisão existe e como ela se conecta aos conceitos matemáticos, computacionais e de Machine
+Learning ensinados pelo projeto. Essa documentação faz parte do conteúdo pedagógico e não deve ser
+tratada como acabamento opcional.
+
+Sempre que aplicável:
+
+- use docstrings em módulos, classes e funções para explicar objetivo, parâmetros, tipos, unidades,
+  valores padrão, retorno, exceções, efeitos colaterais, pré-condições e limitações;
+- descreva o formato e o significado dos dados, incluindo dimensões, colunas, domínio dos valores e
+  unidades como metros quadrados, reais, probabilidades ou classes;
+- explique fórmulas, variáveis e operações intermediárias, relacionando a notação matemática à
+  implementação;
+- registre por que sementes, limiares, hiperparâmetros, validações e escolhas algorítmicas foram
+  adotados, distinguindo decisões didáticas de requisitos de produção;
+- comente etapas cuja finalidade não seja imediatamente evidente para um estudante, inclusive
+  preparação de dados, prevenção de vazamento, estabilidade numérica, otimização, avaliação e
+  conversões de escala;
+- explicite casos-limite, hipóteses, riscos de interpretação e usos inadequados, especialmente em
+  exemplos com dados sintéticos, métricas e previsões;
+- inclua exemplos pequenos quando eles tornarem o comportamento ou o contrato mais concreto;
+- mantenha comentários próximos do trecho explicado e atualize-os junto com o código, evitando
+  documentação desatualizada ou que apenas repita literalmente a instrução Python.
+
+A profundidade deve favorecer o estudo autônomo: um aluno deve conseguir acompanhar entradas,
+transformações, cálculos, decisões e saídas lendo o código em sequência. Ainda assim, a
+documentação deve permanecer tecnicamente precisa e explicar a intenção real do programa, sem
+inventar garantias ou ocultar simplificações pedagógicas.
 
 ## Última validação conhecida
 
