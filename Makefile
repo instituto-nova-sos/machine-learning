@@ -1,4 +1,4 @@
-.PHONY: setup test lint format typecheck run-example validate
+.PHONY: setup test lint format typecheck run-example run-classification validate
 
 setup:
 	python -m pip install -e ".[dev]"
@@ -21,4 +21,7 @@ run-example:
 	python -m sos_ml.evaluate --data data/processed/imoveis.csv --model artifacts/modelo_linear.json
 	python -m sos_ml.predict --model artifacts/modelo_linear.json --area 85
 
-validate: lint typecheck test run-example
+run-classification:
+	python -m sos_ml.classify --plot artifacts/classificacao_e_perda.png
+
+validate: lint typecheck test run-example run-classification

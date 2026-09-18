@@ -22,7 +22,7 @@ avaliação e sistemas de ML — não apenas operar notebooks, APIs ou chamadas 
 
 ## Estado atual
 
-Última atualização registrada: **6 de agosto de 2026**.
+Última atualização registrada: **18 de setembro de 2026**.
 
 A primeira trilha foi implementada, executada e testada:
 
@@ -33,6 +33,7 @@ fundamentos-ia
 → vetores-e-matrizes
 → regressao-linear
 → otimizacao-e-gradiente
+→ classificacao
 ```
 
 Ela contém documentação conceitual, prática, exercícios em três níveis, soluções separadas do
@@ -48,7 +49,8 @@ somente planejamento.
 | Vetores e matrizes | testado | Python puro, NumPy e testes |
 | Regressão linear | testado | manual, sklearn, CLI e artefato |
 | Otimização e gradiente | testado | treino manual, curva e gradient check |
-| Classificação e avaliação | planejado | próxima expansão; não há material placeholder |
+| Classificação | testado | sigmoid, limiar, logística manual/NumPy/sklearn e projeto sintético |
+| Avaliação de modelos | planejado | contagens e baseline introdutórios existem; métricas completas pendentes |
 | Redes neurais, backpropagation e deep learning | planejado | expansão posterior |
 | PyTorch e engenharia de ML completa | planejado | CLI inicial existe; expansão posterior |
 | Projeto integrador e rubrica | planejado | após os fundamentos restantes |
@@ -62,6 +64,12 @@ Um item só muda para **testado** depois de sua execução ser registrada neste 
 - `src/sos_ml/train.py`, `evaluate.py` e `predict.py`: CLIs;
 - `scripts/gerar_dados_imoveis.py`: geração determinística do dataset;
 - `scripts/visualizar_regressao.py`: gráfico do ajuste e da perda;
+- `src/sos_ml/from_scratch/activations.py`: sigmoid estável e decisão por limiar;
+- `src/sos_ml/from_scratch/logistic_regression.py`: logística binária em Python puro;
+- `src/sos_ml/from_scratch/logistic_regression_numpy.py`: operações vetorizadas com API equivalente;
+- `src/sos_ml/sklearn_models/logistic_regression.py`: comparação sem penalização;
+- `src/sos_ml/equipment_data.py`: geração sintética e preparação sem vazamento;
+- `src/sos_ml/classify.py`: experimento completo e gráfico opcional de treino;
 - `tests/`: testes unitários, integração de CLI e gradient check;
 - `data/`: documentação e dados sintéticos gerados;
 - `artifacts/`: modelo e gráficos produzidos localmente;
@@ -132,8 +140,8 @@ Ambiente usado: `.venv` local, Python 3.14 disponível na máquina. O projeto de
 
 ```text
 Ruff: aprovado
-Mypy: 17 arquivos-fonte, sem erros
-Pytest: 18 testes aprovados
+Mypy: 23 arquivos-fonte, sem erros
+Pytest: 76 testes aprovados
 Dataset: 120 exemplos sintéticos, semente 42
 Treino: 96 exemplos
 Teste preservado: 24 exemplos
@@ -141,6 +149,53 @@ RMSE observado: aproximadamente R$ 18.603,65
 Inferência para 85 m²: aproximadamente R$ 350.577,02
 Gráfico: artifacts/regressao_e_perda.png
 ```
+
+Classificação executada em CPU com Python 3.14.7 e Scikit-learn 1.9.0:
+
+```text
+Dataset: 400 exemplos sintéticos; semente 42
+Partição: semente 17, 320 exemplos de treino e 80 de teste
+Falhas observadas: 118 no treino e 33 no teste
+Treino manual e NumPy: taxa 0,1; 2000 épocas
+Perda manual após primeira/final atualização: 0,683351 → 0,442527
+Pesos padronizados: aproximadamente [1,357201; 1,333977]; viés -0,890922
+Cada implementação: 64/80 acertos; 6 falsos alertas; 10 falhas não detectadas
+Baseline de classe majoritária no treino: classe 0, 47/80 acertos
+Nova medida (80 °C, 5 mm/s): probabilidade estimada 0,5696
+Gráfico: artifacts/classificacao_e_perda.png
+```
+
+Decisões da classificação: dados independentes com duas colunas (temperatura, vibração), alvo de
+falha nas próximas 24 horas, rótulos Bernoulli com sobreposição e scalers por coluna ajustados
+apenas no treino. As constantes do gerador definem um mundo artificial, não estatísticas
+aprendidas. O limiar padrão 0,5 inclui o empate na classe 1. A versão NumPy herda o ciclo manual
+e vetoriza escores, probabilidades, perda e gradientes; mantém listas na API por clareza didática.
+Scikit-learn usa C infinito e L-BFGS para comparar o objetivo sem regularização. Não há migração
+de APIs existentes nem persistência do classificador. Métricas completas, seleção de limiar em
+validação e uso operacional permanecem fora desta etapa.
+
+Comandos efetivamente executados nesta fase, na raiz e usando a `.venv` existente:
+
+```bash
+.venv/bin/python -m ruff check .
+.venv/bin/python -m mypy
+.venv/bin/python -m pytest
+PATH="$PWD/.venv/bin:$PATH" make validate
+.venv/bin/python scripts/visualizar_regressao.py
+.venv/bin/python -m sos_ml.classify --plot artifacts/classificacao_e_perda.png
+git diff --check
+```
+
+`make validate` executou também geração, treino, avaliação e inferência imobiliária e confirmou
+os resultados anteriores. Os três blocos Python de `classificacao/pratica.md` foram extraídos e
+executados separadamente; os 29 links locais do novo módulo foram conferidos. O gráfico de
+classificação foi inspecionado visualmente. A revisão local verificou derivadas, estabilidade,
+equivalência das implementações e prevenção de vazamento. Sem falhas pendentes ou referências
+duvidosas identificadas. No sandbox, Matplotlib/Fontconfig emitiram avisos de cache sem permissão;
+o fallback temporário permitiu gerar o gráfico de classificação. O script anterior de gráfico
+imobiliário abortou no sandbox e foi reexecutado com permissão fora dele, com sucesso.
+Python 3.11/3.12 e versões mínimas das
+dependências não foram executados nesta fase; a validação registrada refere-se ao ambiente local.
 
 Os valores podem variar se o gerador, a partição, a semente ou o algoritmo forem alterados. Uma
 mudança intencional deve atualizar os testes e este registro.
@@ -162,6 +217,7 @@ python -m sos_ml.train --data data/processed/imoveis.csv --output artifacts/mode
 python -m sos_ml.evaluate --data data/processed/imoveis.csv --model artifacts/modelo_linear.json
 python -m sos_ml.predict --model artifacts/modelo_linear.json --area 85
 python scripts/visualizar_regressao.py
+python -m sos_ml.classify --plot artifacts/classificacao_e_perda.png
 ```
 
 No Windows PowerShell, a ativação é `.venv\Scripts\Activate.ps1`. Se o caminho mudar, recrie a
@@ -171,19 +227,17 @@ No Windows PowerShell, a ativação é `.venv\Scripts\Activate.ps1`. Se o caminh
 
 Continuar nesta ordem, mantendo cada etapa executável antes de avançar:
 
-1. `classificacao`: sigmoid, limiar, fronteira de decisão, classificador binário simplificado,
-   regressão logística manual, NumPy e Scikit-learn, com pequeno projeto de falha de equipamento.
-2. `avaliacao-de-modelos`: matriz de confusão, acurácia, precisão, revocação, F1,
+1. `avaliacao-de-modelos`: matriz de confusão, acurácia, precisão, revocação, F1,
    desbalanceamento, baselines e testes das métricas manuais.
-3. `generalizacao-e-overfitting`: treino, validação, teste, underfitting, overfitting,
+2. `generalizacao-e-overfitting`: treino, validação, teste, underfitting, overfitting,
    regularização, validação cruzada, leakage e exemplos deliberadamente enganosos.
-4. `neuronio-artificial` e `redes-neurais`: ativações, neurônio, camada densa e MLP em NumPy,
+3. `neuronio-artificial` e `redes-neurais`: ativações, neurônio, camada densa e MLP em NumPy,
    com testes de forma e forward propagation.
-5. `backpropagation`: exemplo escalar completo, rede mínima com intermediários, implementação
+4. `backpropagation`: exemplo escalar completo, rede mínima com intermediários, implementação
    vetorizada e verificações por diferenças finitas.
-6. `deep-learning` e `pytorch-na-pratica`: correspondência entre implementações manuais e
+5. `deep-learning` e `pytorch-na-pratica`: correspondência entre implementações manuais e
    PyTorch; regressão, classificador, MLP, treino, persistência e inferência em CPU.
-7. `engenharia-de-ml` e `projeto-integrador`: configuração, logs, esquemas, reprodutibilidade,
+6. `engenharia-de-ml` e `projeto-integrador`: configuração, logs, esquemas, reprodutibilidade,
    segurança de artefatos, monitoramento, aplicação final, testes, rubrica e análise ética.
 
 Antes de criar novos diretórios, verificar se haverá conteúdo real. Não criar árvores vazias para
@@ -194,8 +248,6 @@ simular completude.
 A especificação prevê estes arquivos adicionais em `src/sos_ml/from_scratch/`:
 
 ```text
-logistic_regression.py
-activations.py
 neuron.py
 dense_layer.py
 neural_network.py
@@ -208,7 +260,9 @@ escala devem ser estendidos somente quando a nova etapa exigir, preservando APIs
 possível.
 
 Também permanecem pendentes implementações em `torch_models/`, avaliação e classificação
-profissionais, projeto integrador, rubrica final e testes de serialização PyTorch.
+profissionais mais amplas, projeto integrador, rubrica final e testes de serialização PyTorch.
+`activations.py` já contém sigmoid; outras ativações serão adicionadas quando redes neurais
+exigirem. A logística manual, NumPy e Scikit-learn já está implementada e testada.
 
 ## Critério para atualizar este arquivo
 
@@ -225,6 +279,6 @@ Ao encerrar cada nova fase:
 
 Ao iniciar em um novo contexto, leia integralmente `AGENTS.md`, `README.md` e
 `docs/jornada-de-aprendizado.md`; inspecione e valide o repositório antes de editar. Preserve as
-decisões registradas e não refaça trabalho concluído. A próxima fase começa por classificação, com
+decisões registradas e não refaça trabalho concluído. A próxima fase é avaliação de modelos, com
 conteúdo em português brasileiro, implementação manual antes de bibliotecas, testes, referências
 verificáveis e execução em CPU.
