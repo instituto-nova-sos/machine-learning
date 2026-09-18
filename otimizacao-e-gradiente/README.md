@@ -1,6 +1,6 @@
 # Otimização e gradiente
 
-[← Regressão linear](../regressao-linear/README.md) · [Aula principal](../README.md)
+[← Regressão linear](../regressao-linear/README.md) · [Aula principal](../README.md) · [Classificação →](../classificacao/README.md)
 
 **Pré-requisitos:** derivadas, MSE e regressão linear.
 **Resultados:** interpretar espaço de parâmetros e gradiente; executar gradiente descendente;

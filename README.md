@@ -628,6 +628,19 @@ Veja instruções e solução de problemas em [Ambiente local](docs/ambiente-loc
 4. [Vetores e matrizes](vetores-e-matrizes/README.md) — formas, produto escalar e vetorização.
 5. [Regressão linear](regressao-linear/README.md) — modelo, MSE e três níveis de implementação.
 6. [Otimização e gradiente](otimizacao-e-gradiente/README.md) — atualizações e convergência.
+7. [Classificação](classificacao/README.md) — sigmoid, limiar e regressão logística em Python puro,
+   NumPy e Scikit-learn, com projeto sintético de falha de equipamento.
+
+Depois de concluir a regressão, execute o novo projeto na raiz, com o ambiente ativado:
+
+```bash
+python -m sos_ml.classify --plot artifacts/classificacao_e_perda.png
+```
+
+O experimento gera 400 observações fictícias de temperatura e vibração, separa treino/teste
+antes da padronização e compara as três implementações. A trilha explica cada cálculo, inclui
+exercícios e soluções separadas e distingue probabilidade estimada de decisão por limiar.
+Os dados não validam qualquer uso em manutenção ou segurança de equipamentos reais.
 
 ### Guias complementares
 
@@ -654,6 +667,7 @@ make lint       # análise estática com Ruff
 make format     # formatação automática
 make typecheck  # verificação de tipos com mypy
 make run-example
+make run-classification
 make validate   # validação integrada
 ```
 
@@ -661,8 +675,8 @@ As atividades obrigatórias executam em CPU e não exigem nuvem, GPU ou conta pa
 ponto flutuante usam tolerâncias, pois representações binárias tornam igualdade exata inadequada
 em muitos cálculos.
 
-A próxima expansão será classificação binária e avaliação de modelos. Antes de avançar, confirme
-que você consegue explicar e implementar uma previsão, um resíduo, o MSE e uma atualização de
+A próxima expansão será avaliação de modelos e generalização. Antes de avançar à classificação,
+confirme que você consegue explicar e implementar uma previsão, um resíduo, o MSE e uma atualização de
 parâmetros sem recorrer a `fit()`.
 
 Código e textos usam licença MIT. Datasets externos podem possuir licenças próprias; esta etapa
