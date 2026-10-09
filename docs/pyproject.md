@@ -224,3 +224,14 @@ Ambientes virtuais guardam caminhos absolutos. Não edite manualmente os arquivo
 ---
 
 [← Voltar à aula principal](../README.md) · [Próximo: jornada de aprendizado →](jornada-de-aprendizado.md)
+
+## Grupos por etapa
+
+`dev` mantém ferramentas de qualidade; `torch` (já existente) habilita a etapa
+PyTorch em CPU após os fundamentos. `jev` fixa `typesafe-sdk==0.7.2` somente para
+integração remota opcional. Não instalamos SDK ou LLM como dependência da base.
+O `requires-python >=3.11` foi preservado; isso não significa que toda versão de
+cada wheel existe em todo sistema. Consulte ambiente e prática PyTorch.
+
+O mínimo do extra torch passou de 2.2 para 2.10 após checar o aviso oficial de
+segurança da recarga weights_only; detalhes e fonte na prática PyTorch.

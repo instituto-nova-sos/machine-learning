@@ -11,3 +11,19 @@
 - Scikit-learn Developers. *User Guide*. https://scikit-learn.org/stable/user_guide.html
 
 URLs apontam para páginas oficiais dos projetos ou autores. Nenhum trecho longo é reproduzido.
+
+## Expansão até sistemas locais — consulta em 2 de outubro de 2026
+
+- [PyTorch: Learn the Basics](https://docs.pytorch.org/tutorials/beginner/basics/intro.html).
+- [PyTorch: tensores](https://docs.pytorch.org/tutorials/beginner/basics/tensorqs_tutorial.html),
+  [autograd](https://docs.pytorch.org/tutorials/beginner/basics/autogradqs_tutorial.html) e
+  [persistência](https://docs.pytorch.org/tutorials/beginner/basics/saveloadrun_tutorial.html).
+- [ExecuTorch: documentação](https://docs.pytorch.org/executorch/stable/index.html), leitura opcional.
+- Vaswani et al. *Attention Is All You Need*, 2017. [Artigo original](https://arxiv.org/abs/1706.03762).
+- [TypeSafe: introdução ao Jev](https://docs.typesafe.ai/introduction),
+  [primitivas](../jev-na-pratica/referencias.md) e [SDK oficial](https://docs.typesafe.ai/sdk/python).
+
+Fatos específicos de Jev são atribuídos às fontes oficiais na data de acesso;
+interpretações arquiteturais locais são identificadas como educacionais. Não
+extrapolamos marketing para garantias de precisão/latência/calibração. A licença
+do SDK não comprova licença dos pesos. O serviço remoto é exercício opcional.

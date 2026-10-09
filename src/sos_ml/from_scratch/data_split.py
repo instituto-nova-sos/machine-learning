@@ -45,3 +45,24 @@ def train_test_indices(
     if test_size >= size:
         test_size = size - 1
     return indices[test_size:], indices[:test_size]
+
+
+def train_validation_test_indices(
+    size: int, *, seed: int = 17
+) -> tuple[list[int], list[int], list[int]]:
+    """Separa aproximadamente 60%/20%/20% antes de ajustar qualquer transformação.
+
+    Primeiro preserva 20% de teste; dos restantes reserva 25% para validação,
+    equivalentes a 20% do total. A segunda semente (seed+1) separa os sorteios.
+    Com 400 linhas retorna 240/80/80 índices disjuntos. Requer ao menos cinco
+    exemplos; frações efetivas variam por arredondamento. Não é divisão temporal,
+    estratificada ou por grupos: só serve a observações independentes da prática.
+    """
+    if isinstance(size, bool) or not isinstance(size, int) or size < 5:
+        raise ValueError("A partição tripla exige pelo menos cinco exemplos.")
+    development, test = train_test_indices(size, seed=seed)
+    train_local, validation_local = train_test_indices(
+        len(development), test_fraction=0.25, seed=seed + 1
+    )
+    return ([development[i] for i in train_local],
+            [development[i] for i in validation_local], test)

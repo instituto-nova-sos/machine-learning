@@ -9,3 +9,7 @@ artifacts/*.json
 artifacts/*.png
 data/processed/*.csv
 .DS_Store
+
+artifacts/*.pt
+artifacts/*.jsonl
+.env
