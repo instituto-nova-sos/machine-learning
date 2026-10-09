@@ -20,13 +20,14 @@ run-example:
 	python -m sos_ml.train --data data/processed/imoveis.csv --output artifacts/modelo_linear.json
 	python -m sos_ml.evaluate --data data/processed/imoveis.csv --model artifacts/modelo_linear.json
 	python -m sos_ml.predict --model artifacts/modelo_linear.json --area 85
+	python scripts/visualizar_regressao.py
 
 run-classification:
 	python -m sos_ml.classify --plot artifacts/classificacao_e_perda.png
 
 validate: lint typecheck test run-example run-classification
 
-.PHONY: run-foundations run-local-ai validate-torch
+.PHONY: run-foundations run-local-ai validate-torch validate-material
 
 run-foundations:
 	python -m sos_ml.assess
@@ -46,3 +47,10 @@ validate-torch:
 	python -m sos_ml.torch_demo inferir
 
 validate: run-foundations run-local-ai
+
+# Os exemplos de inferência precisam do artefato produzido por run-local-ai.
+# A dependência torna este alvo utilizável também após um clone sem artefatos.
+validate-material: run-local-ai
+	python scripts/verificar_material.py
+
+validate: validate-material

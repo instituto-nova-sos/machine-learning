@@ -52,3 +52,20 @@ medir latência, bytes e tamanho do artefato em vez de prometer rapidez universa
 
 O modelo final não controla equipamento. Produz saída didática com política explícita,
 limites e revisão; nenhum dado sintético valida manutenção ou segurança industrial.
+
+## Consolidação — 9 de outubro de 2026
+
+A expansão foi encontrada na árvore de trabalho e registrada no commit `818f08d`,
+na branch `chore/consolidacao-trilha-validacao-python`. Não foi necessário repetir
+a implementação das fases. A manutenção passou a conferir material documental
+no `make validate` e a oferecer restrições mínimas e uma matriz de CI.
+
+Em macOS ARM64, Python 3.11.17 com base/dev nos mínimos e torch 2.10.0, e Python
+3.12.15 com dependências atuais e torch 2.14.1, aprovaram 119 testes cada. Ruff e
+mypy passaram nas duas faixas; treino, avaliação, persistência e inferência foram
+reproduzidos em CPU. O adaptador Jev recebeu uma anotação TypeGuard compatível com
+os dois verificadores, mantendo sua validação offline.
+
+O registro completo em AGENTS.md distingue os ambientes de 2 e 9 de outubro.
+Os jobs Linux/Windows ainda precisam ser executados no GitHub; configurar a matriz
+não os torna testados. Jev live permanece opcional e não executado.

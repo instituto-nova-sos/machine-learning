@@ -22,9 +22,9 @@ avaliação e sistemas de ML — não apenas operar notebooks, APIs ou chamadas 
 
 ## Estado atual
 
-Última atualização registrada: **2 de outubro de 2026**.
+Última atualização registrada: **9 de outubro de 2026**.
 
-A primeira trilha foi implementada, executada e testada:
+A trilha foi implementada até o projeto integrador, com execução local das práticas:
 
 ```text
 fundamentos-ia
@@ -34,6 +34,11 @@ fundamentos-ia
 → regressao-linear
 → otimizacao-e-gradiente
 → classificacao
+→ avaliacao-de-modelos → generalizacao-e-overfitting
+→ neuronio-artificial → redes-neurais → backpropagation
+→ deep-learning → pytorch-na-pratica → inferencia-local
+→ modelos-de-decisao → jev-na-pratica → engenharia-de-ml
+→ projeto-integrador
 ```
 
 Ela contém documentação conceitual, prática, exercícios em três níveis, soluções separadas do
@@ -63,6 +68,30 @@ somente planejamento.
 | Projeto integrador e rubrica | testado | fluxo local completo e rubrica de 100 pontos |
 
 Um item só muda para **testado** depois de sua execução ser registrada neste arquivo.
+
+## Última validação: consolidação — 9 de outubro de 2026
+
+Os testes foram executados em macOS ARM64 com ambientes separados do ambiente de trabalho:
+
+| Python | Dependências diretas da base | PyTorch CPU | Suíte final |
+|---|---|---|---|
+| 3.11.17 | NumPy 1.26.0, pandas 2.1.0, Matplotlib 3.8.0, Scikit-learn 1.4.0 | 2.10.0 | 119 aprovados |
+| 3.12.15 | NumPy 2.5.3, pandas 2.3.3, Matplotlib 3.11.2, Scikit-learn 1.9.1 | 2.14.1 | 119 aprovados |
+
+Ruff 0.6.0 e mypy 1.11.0 passaram no ambiente mínimo; Ruff 0.17.0 e mypy 1.20.2
+passaram no ambiente atual. Mypy verificou 39 fontes em ambos. O teste inicial da
+base sem PyTorch em Python 3.11 teve 115 aprovados e um módulo ignorado; a suíte
+de 119 foi executada depois de instalar a etapa PyTorch. Não confundir esse skip
+inicial com validação do extra.
+
+O ambiente mínimo apresentou um aviso de depreciação de opções L-BFGS-B no
+Scikit-learn 1.4.0 com SciPy 1.16.3, sem falha. As restrições mínimas abrangem as
+dependências diretas da base e do grupo dev, não todas as transitivas ou o backend
+de construção. Linux/Windows ainda dependem da execução da CI configurada;
+configuração e parse de YAML não equivalem a executar esses sistemas.
+
+Os registros de 2 de outubro abaixo são históricos. Consulte também o registro
+detalhado desta consolidação no final do arquivo.
 
 ## Arquitetura implementada
 
@@ -140,7 +169,7 @@ transformações, cálculos, decisões e saídas lendo o código em sequência. 
 documentação deve permanecer tecnicamente precisa e explicar a intenção real do programa, sem
 inventar garantias ou ocultar simplificações pedagógicas.
 
-## Última validação conhecida
+## Histórico: validação até classificação
 
 Ambiente usado: `.venv` local, Python 3.14 disponível na máquina. O projeto declara Python
 `>=3.11`; a documentação recomenda 3.11 ou 3.12 para estudantes.
@@ -465,3 +494,85 @@ local de pesos oficiais; versões mínimas e sistemas da turma não executados;
 nenhum serviço industrial, CNN/RNN/Transformer grande ou ExecuTorch foi implantado.
 Essas atividades não são prometidas pela trilha obrigatória. Sem falhas conhecidas
 nos caminhos executados ou referência bibliográfica inventada identificada.
+
+## Registro detalhado da consolidação — 9 de outubro de 2026
+
+A expansão encontrada na árvore de trabalho foi preservada na branch
+`chore/consolidacao-trilha-validacao-python`, no commit `818f08d`. Essa etapa
+registra os 19 módulos existentes, sem nova fase pedagógica ou migração de APIs.
+A recomendação de Python 3.11/3.12 foi verificada localmente nos dois ambientes da
+tabela de última validação, separados da `.venv` de trabalho.
+
+Mudanças de manutenção:
+
+- `tests/constraints-min.txt` fixa o piso das dependências diretas da base/dev em
+  Python 3.11; as transitivas continuam resolvidas, sem promessa de lock completo;
+- Ruff 0.6.0 exigiu `int | float` nos testes de tipo do adaptador Jev; mypy 1.11.0
+  exigiu `TypeGuard[Action]` explícito. O contrato e as decisões permanecem iguais.
+  Um cast intermediário foi rejeitado como redundante pelo mypy atual e substituído
+  pelo guard antes da validação final;
+- o verificador documental lê Markdown explicitamente como UTF-8;
+- `make validate` inclui o gráfico imobiliário e os exemplos/links documentais;
+  `validate-material` depende do treino que produz seu artefato, inclusive após clone;
+- `.github/workflows/validacao.yml` configura sete jobs da base (três sistemas,
+  duas versões Python e um mínimo Linux/3.11) e quatro jobs PyTorch CPU em Linux
+  (duas versões Python, piso e atual). YAML analisado localmente; CI remota pendente;
+- README e guia de ambiente distinguem resultados executados de CI configurada.
+
+Execuções concluídas em macOS ARM64:
+
+- Python 3.11.17: `make validate` passou com 115 testes base e um skip PyTorch
+  antes da instalação do extra; depois de instalar torch 2.10.0, `pytest` aprovou
+  119 testes. `make validate-torch` aprovou quatro testes de ponte e treino/recarga
+  em processos separados;
+- Python 3.12.15: `make validate` passou com 119 testes; `make validate-torch`
+  aprovou quatro testes de ponte e treino/recarga em processos separados com torch 2.14.1;
+- Ruff/mypy passaram nas versões mínimas e atuais; mypy: 39 fontes em ambos;
+- `pip check` passou nos dois ambientes; caches mypy/Matplotlib separados em `/tmp`;
+- 12 blocos Python, sem skips PyTorch, e 330 links locais sem destino ausente;
+- regressão: RMSE 18603,65 e previsão 350577,02; logística: 64/80 acertos, 6 FP e 10 FN;
+  árvore: profundidade 7, erro teste 0,30; MLP: época 92, acurácia 0,775, F1 0,7 e
+  p(80,5)=0,651786 preservados nos ambientes;
+- gradient check: aproximadamente 4,68e-11 em NumPy 1.26 e 4,31e-11 em NumPy 2.5,
+  dentro da tolerância. JSON: 1009 e 1006 bytes, respectivamente; casas decimais
+  serializadas podem variar. Não exigir hash idêntico entre ambientes;
+- gráficos imobiliário e MLP treino/validação regenerados e inspecionados;
+- alta consequência encaminhou para humano; 150 °C/5 mm/s retornou abstenção com
+  probability=null. Jev permaneceu offline, sem credenciais ou chamada real.
+
+Preparação realmente executada (uv 0.13.0 foi ferramenta temporária, não uma
+dependência obrigatória do curso):
+
+```bash
+.venv/bin/python -m pip install --target /tmp/sos-ml-validation-tools uv
+/tmp/sos-ml-validation-tools/bin/uv python install 3.11 3.12 --install-dir /tmp/sos-ml-pythons --no-bin --cache-dir /tmp/sos-ml-uv-cache
+/tmp/sos-ml-pythons/cpython-3.11.17-macos-aarch64-none/bin/python3.11 -m venv /tmp/sos-ml-py311-min
+/tmp/sos-ml-pythons/cpython-3.12.15-macos-aarch64-none/bin/python3.12 -m venv /tmp/sos-ml-py312
+/tmp/sos-ml-validation-tools/bin/uv pip install --python /tmp/sos-ml-py311-min/bin/python --cache-dir /tmp/sos-ml-uv-cache -c tests/constraints-min.txt -e '.[dev]'
+/tmp/sos-ml-validation-tools/bin/uv pip install --python /tmp/sos-ml-py311-min/bin/python --cache-dir /tmp/sos-ml-uv-cache -c tests/constraints-min.txt 'torch==2.10.0'
+/tmp/sos-ml-validation-tools/bin/uv pip install --python /tmp/sos-ml-py312/bin/python --cache-dir /tmp/sos-ml-uv-cache -e '.[dev]'
+/tmp/sos-ml-validation-tools/bin/uv pip install --python /tmp/sos-ml-py312/bin/python --cache-dir /tmp/sos-ml-uv-cache -e '.[dev,torch]'
+```
+
+Validações realmente executadas:
+
+```bash
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-311-mpl XDG_CACHE_HOME=/tmp/sos-ml-311-cache MYPY_CACHE_DIR=/tmp/sos-ml-311-mypy PYTHONUTF8=1 PATH="/tmp/sos-ml-py311-min/bin:$PATH" make validate
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-311-mpl XDG_CACHE_HOME=/tmp/sos-ml-311-cache PYTHONUTF8=1 /tmp/sos-ml-py311-min/bin/python -m pytest
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-311-mpl XDG_CACHE_HOME=/tmp/sos-ml-311-cache PATH="/tmp/sos-ml-py311-min/bin:$PATH" make validate-torch
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-311-mpl XDG_CACHE_HOME=/tmp/sos-ml-311-cache /tmp/sos-ml-py311-min/bin/python scripts/visualizar_regressao.py
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-312-mpl XDG_CACHE_HOME=/tmp/sos-ml-312-cache MYPY_CACHE_DIR=/tmp/sos-ml-312-mypy PYTHONUTF8=1 PATH="/tmp/sos-ml-py312/bin:$PATH" make validate
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-312-mpl XDG_CACHE_HOME=/tmp/sos-ml-312-cache PYTHONUTF8=1 PATH="/tmp/sos-ml-py312/bin:$PATH" make validate-torch
+MYPY_CACHE_DIR=/tmp/sos-ml-311-mypy /tmp/sos-ml-py311-min/bin/python -m mypy
+MYPY_CACHE_DIR=/tmp/sos-ml-312-mypy /tmp/sos-ml-py312/bin/python -m mypy
+/tmp/sos-ml-py311-min/bin/python -m pip check
+/tmp/sos-ml-py312/bin/python -m pip check
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-ml-312-mpl XDG_CACHE_HOME=/tmp/sos-ml-312-cache /tmp/sos-ml-py312/bin/python -m sos_ml.local_ai inferir --temperature 150 --vibration 5
+git diff --check
+```
+
+Downloads inicialmente falharam por DNS no sandbox e foram concluídos após
+aprovação. Não se instalou Python globalmente nem se substituiu a `.venv` de
+trabalho. Sem falhas nos caminhos finais; o aviso de depreciação do SciPy no
+Scikit-learn mínimo permanece explícito. Linux/Windows, mínimos de todas as
+transitivas e Jev live permanecem sem execução nesta máquina.

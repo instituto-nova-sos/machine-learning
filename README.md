@@ -683,11 +683,16 @@ make run-example
 make run-classification
 make validate   # validação integrada local
 make validate-torch  # exige extra torch; ponte, persistência e inferência
+make validate-material  # gera artefato local e confere exemplos/links do material
 ```
 
 As atividades obrigatórias executam em CPU e não exigem nuvem, GPU ou conta paga. Comparações de
 ponto flutuante usam tolerâncias, pois representações binárias tornam igualdade exata inadequada
 em muitos cálculos.
+
+`make validate` inclui a conferência dos exemplos independentes e links locais da
+documentação. O protocolo para testar Python 3.11/3.12, os mínimos declarados e a
+matriz de CI está em [compatibilidade do ambiente](docs/ambiente-local.md#compatibilidade-e-validação-de-manutenção).
 
 A continuação cobre avaliação, redes, PyTorch, inferência e decisões locais. Antes de avançar à classificação,
 confirme que você consegue explicar e implementar uma previsão, um resíduo, o MSE e uma atualização de

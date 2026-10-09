@@ -1,0 +1,11 @@
+# Contrato mínimo das dependências diretas da base e das ferramentas de desenvolvimento.
+# Use com Python 3.11: python -m pip install -c tests/constraints-min.txt -e '.[dev]'.
+# Não é um lock de produção: dependências transitivas continuam sendo resolvidas pelo pip.
+# PyTorch e Jev são etapas separadas e não entram nesta instalação base.
+numpy==1.26.0
+pandas==2.1.0
+matplotlib==3.8.0
+scikit-learn==1.4.0
+pytest==8.0.0
+ruff==0.6.0
+mypy==1.11.0

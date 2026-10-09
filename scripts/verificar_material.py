@@ -49,7 +49,7 @@ def main() -> int:
             if module == "classificacao" and document.name != "pratica.md":
                 continue
             for index, code in enumerate(
-                re.findall(r"```python\n(.*?)```", document.read_text(), re.S)
+                re.findall(r"```python\n(.*?)```", document.read_text(encoding="utf-8"), re.S)
             ):
                 if "import torch" in code and not torch_installed:
                     skipped += 1
@@ -63,7 +63,7 @@ def main() -> int:
     for document in root.rglob("*.md"):
         if any(part.startswith(".") for part in document.relative_to(root).parts):
             continue
-        for target in re.findall(r"\]\(([^)]+)\)", document.read_text()):
+        for target in re.findall(r"\]\(([^)]+)\)", document.read_text(encoding="utf-8")):
             if "://" in target or target.startswith("#"):
                 continue
             path = target.split("#")[0]

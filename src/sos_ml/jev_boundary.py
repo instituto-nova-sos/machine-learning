@@ -7,6 +7,7 @@ Nunca transforme confidence ou score em probabilidade de falha por conveniência
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import TypeGuard
 
 from .decisions import ACTIONS, Action, PolicyResult
 
@@ -18,6 +19,16 @@ class JevChoice:
     choice: Action
     probabilities: dict[str, float]
     confidence: float
+
+
+def _is_action(value: object) -> TypeGuard[Action]:
+    """Valida a opção em execução e comunica seu tipo restrito ao mypy.
+
+    O payload externo começa com valores de tipo object. TypeGuard permite que
+    as versões mínima e atual do verificador reconheçam Action após este teste;
+    não depende de inferirem sozinhas o tipo Literal a partir de ``in``.
+    """
+    return value in ACTIONS
 
 
 def parse_choice(payload: Mapping[str, object]) -> JevChoice:
@@ -32,18 +43,18 @@ def parse_choice(payload: Mapping[str, object]) -> JevChoice:
     confidence = payload.get("confidence")
     if (
         payload.get("type") != "choice"
-        or choice not in ACTIONS
+        or not _is_action(choice)
         or not isinstance(distribution, dict)
         or set(distribution) != set(ACTIONS)
         or isinstance(confidence, bool)
-        or not isinstance(confidence, (int, float))
+        or not isinstance(confidence, int | float)
     ):
         raise ValueError("Resposta Choice incompatível com o contrato de ações.")
     values = {}
     for key, value in distribution.items():
         if (
             isinstance(value, bool)
-            or not isinstance(value, (int, float))
+            or not isinstance(value, int | float)
             or not math.isfinite(value)
             or not 0 <= value <= 1
         ):
