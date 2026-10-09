@@ -1,4 +1,4 @@
-# Fundamentos de Machine Learning: do dado ao gradiente
+# Fundamentos de IA: do dado ao sistema local
 
 > **SOS Capacita — Programação com IA**
 > **Módulo — Introdução ao Machine Learning e fundamentos matemáticos**
@@ -262,7 +262,7 @@ número sozinho; vem do contrato que estabelecemos para os dados.
 escalar:  85
 vetor:    [85, 3, 12]                  # um imóvel, três atributos
 matriz:   [[85, 3, 12], [60, 2, 8]]    # dois imóveis
-tensor:   arranjo com três ou mais eixos
+tensor:   arranjo numérico; pode ter zero, um, dois ou mais eixos
 ```
 
 Em uma matriz de atributos `X`, é comum usar a forma `(n_exemplos, n_atributos)`. Trocar esses
@@ -631,6 +631,19 @@ Veja instruções e solução de problemas em [Ambiente local](docs/ambiente-loc
 7. [Classificação](classificacao/README.md) — sigmoid, limiar e regressão logística em Python puro,
    NumPy e Scikit-learn, com projeto sintético de falha de equipamento.
 
+8. [Avaliação de modelos](avaliacao-de-modelos/README.md) — contagens e métricas manuais.
+9. [Generalização e sobreajuste](generalizacao-e-overfitting/README.md) — validação e capacidade visível.
+10. [Neurônio artificial](neuronio-artificial/README.md) — produto escalar, viés e ativação.
+11. [Redes neurais](redes-neurais/README.md) — camada densa, formas e MLP NumPy.
+12. [Retropropagação](backpropagation/README.md) — cadeia escalar, gradientes e diferenças finitas.
+13. [Deep Learning](deep-learning/README.md) — representação, profundidade e arquiteturas.
+14. [PyTorch na prática](pytorch-na-pratica/README.md) — automação das contas, treino e state_dict.
+15. [Inferência local](inferencia-local/README.md) — CPU, artefatos, memória e latência.
+16. [Modelos de decisão](modelos-de-decisao/README.md) — contrato, política e revisão humana.
+17. [Jev na prática](jev-na-pratica/README.md) — estudo oficial com integração remota opcional.
+18. [Engenharia de ML](engenharia-de-ml/README.md) — contratos, observabilidade e limites.
+19. [Projeto integrador](projeto-integrador/README.md) — sensores sintéticos até decisão e rubrica.
+
 Depois de concluir a regressão, execute o novo projeto na raiz, com o ambiente ativado:
 
 ```bash
@@ -668,16 +681,61 @@ make format     # formatação automática
 make typecheck  # verificação de tipos com mypy
 make run-example
 make run-classification
-make validate   # validação integrada
+make validate   # validação integrada local
+make validate-torch  # exige extra torch; ponte, persistência e inferência
+make validate-material  # gera artefato local e confere exemplos/links do material
 ```
 
 As atividades obrigatórias executam em CPU e não exigem nuvem, GPU ou conta paga. Comparações de
 ponto flutuante usam tolerâncias, pois representações binárias tornam igualdade exata inadequada
 em muitos cálculos.
 
-A próxima expansão será avaliação de modelos e generalização. Antes de avançar à classificação,
+`make validate` inclui a conferência dos exemplos independentes e links locais da
+documentação. O protocolo para testar Python 3.11/3.12, os mínimos declarados e a
+matriz de CI está em [compatibilidade do ambiente](docs/ambiente-local.md#compatibilidade-e-validação-de-manutenção).
+
+A continuação cobre avaliação, redes, PyTorch, inferência e decisões locais. Antes de avançar à classificação,
 confirme que você consegue explicar e implementar uma previsão, um resíduo, o MSE e uma atualização de
 parâmetros sem recorrer a `fit()`.
 
 Código e textos usam licença MIT. Datasets externos podem possuir licenças próprias; esta etapa
 utiliza somente dados sintéticos gerados localmente.
+
+
+## Continuação: do classificador ao sistema
+
+A nova sequência preserva Python puro → NumPy → bibliotecas. A mesma temperatura
+ e vibração sintéticas passam por neurônio, MLP, gradientes, treino, persistência,
+inferência e política. A rede tem 17 parâmetros, executa em CPU e não baixa LLMs.
+
+```bash
+python -m sos_ml.assess
+python -m sos_ml.generalization --plot artifacts/generalizacao.png
+python -m sos_ml.network_demo
+python -m sos_ml.local_ai treinar --plot artifacts/mlp_treino_validacao.png
+python -m sos_ml.local_ai inferir --temperature 80 --vibration 5 --high-consequence
+```
+
+Leia os módulos na ordem antes de executar abstrações. A etapa PyTorch usa o extra
+`torch` já existente, com [instruções CPU por plataforma](pytorch-na-pratica/README.md).
+Treinar e inferir são processos separados; os scalers ficam no artefato. A política
+pode recusar automação por incerteza, consequência ou domínio, mesmo com saída alta.
+Nenhuma previsão sintética é recomendação de manutenção industrial.
+
+Jev é estudo contemporâneo com fontes oficiais consultadas em 2 de outubro de 2026.
+`python scripts/jev_opcional.py` funciona offline com fixture inventado; SDK/chave
+ e serviço são [exercício opcional](jev-na-pratica/README.md), fora da validação e
+rubrica obrigatórias. Nosso adaptador local não é o modelo Jev.
+
+Veja o [plano baseado na inspeção](docs/plano-evolucao.md) e os resultados reais em
+[AGENTS.md](AGENTS.md). A regressão e a classificação anteriores continuam reproduzíveis.
+IA inclui regressões, classificadores e redes; LLM é uma família, inferência pode
+ser local e **o modelo é apenas um componente do sistema**.
+
+### Continuação: Engenharia de ML
+
+[Engenharia de ML](engenharia-de-ml/README.md): Contratos versionados, pré-processamento persistido, observabilidade JSONL, reprodutibilidade, segurança de artefatos e responsabilidade humana.
+
+### Continuação: Projeto integrador
+
+[Projeto integrador](projeto-integrador/README.md): Fluxo local completo de sensores sintéticos até modelo, artefato, inferência, decisão, política, revisão e registro; rubrica de 100 pontos e soluções separadas.

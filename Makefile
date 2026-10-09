@@ -20,8 +20,37 @@ run-example:
 	python -m sos_ml.train --data data/processed/imoveis.csv --output artifacts/modelo_linear.json
 	python -m sos_ml.evaluate --data data/processed/imoveis.csv --model artifacts/modelo_linear.json
 	python -m sos_ml.predict --model artifacts/modelo_linear.json --area 85
+	python scripts/visualizar_regressao.py
 
 run-classification:
 	python -m sos_ml.classify --plot artifacts/classificacao_e_perda.png
 
 validate: lint typecheck test run-example run-classification
+
+.PHONY: run-foundations run-local-ai validate-torch validate-material
+
+run-foundations:
+	python -m sos_ml.assess
+	python -m sos_ml.generalization --plot artifacts/generalizacao.png
+	python -m sos_ml.network_demo
+	python scripts/jev_opcional.py
+
+run-local-ai:
+	python -m sos_ml.local_ai treinar --plot artifacts/mlp_treino_validacao.png
+	python -m sos_ml.local_ai inferir --temperature 80 --vibration 5 --high-consequence --measure
+
+# A base segue sem exigir torch; este alvo falha cedo se a etapa não foi instalada.
+validate-torch:
+	python -c "import torch; print('PyTorch instalado:', torch.__version__)"
+	python -m pytest tests/test_torch_foundations.py
+	python -m sos_ml.torch_demo treinar
+	python -m sos_ml.torch_demo inferir
+
+validate: run-foundations run-local-ai
+
+# Os exemplos de inferência precisam do artefato produzido por run-local-ai.
+# A dependência torna este alvo utilizável também após um clone sem artefatos.
+validate-material: run-local-ai
+	python scripts/verificar_material.py
+
+validate: validate-material

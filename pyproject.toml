@@ -18,7 +18,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<9", "ruff>=0.6,<1", "mypy>=1.11,<2"]
-torch = ["torch>=2.2,<3"]
+# Piso de segurança para carregar state_dict com weights_only (GHSA-63cw-57p8-fm3p).
+torch = ["torch>=2.10,<3"]
+# Integração remota opcional: não participa das atividades obrigatórias.
+jev = ["typesafe-sdk==0.7.2"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

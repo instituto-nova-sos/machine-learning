@@ -122,3 +122,48 @@ def prepare_equipment_data(
         y_train=y_train,
         y_test=[targets[i] for i in test],
     )
+
+
+@dataclass
+class EquipmentDevelopmentSplit:
+    """Partição 60/20/20 para seleção pela validação, com escalas só do treino.
+
+    Guarda índices originais e matrizes padronizadas (n,2). Alvos são 0/1.
+    Transformações de inferência reutilizam scalers, jamais os reajustam.
+    """
+
+    train_indices: list[int]
+    validation_indices: list[int]
+    test_indices: list[int]
+    scalers: list[StandardScaler1D]
+    X_train: list[list[float]]
+    X_validation: list[list[float]]
+    X_test: list[list[float]]
+    y_train: list[int]
+    y_validation: list[int]
+    y_test: list[int]
+
+
+def prepare_development_data(features: Sequence[Sequence[float]],
+                             targets: Sequence[int]) -> EquipmentDevelopmentSplit:
+    """Separa índices antes de aprender médias/desvios, preservando APIs anteriores.
+
+    Usa as mesmas 400 linhas sintéticas e sementes, mas 240/80/80 em vez de
+    320/80: não espere parâmetros iguais aos da classificação original.
+    O treino deve ter ambas as classes e variação em cada coluna.
+    """
+    from .from_scratch.data_split import train_validation_test_indices
+
+    validate_features(features, 2)
+    validate_targets(targets, len(features))
+    train, validation, test = train_validation_test_indices(len(features))
+    if set(targets[i] for i in train) != {0, 1}:
+        raise ValueError("Treino deve conter as duas classes.")
+    scalers = [StandardScaler1D.fit([features[i][j] for i in train]) for j in range(2)]
+    return EquipmentDevelopmentSplit(
+        train, validation, test, scalers,
+        transform_equipment_features([features[i] for i in train], scalers),
+        transform_equipment_features([features[i] for i in validation], scalers),
+        transform_equipment_features([features[i] for i in test], scalers),
+        [targets[i] for i in train], [targets[i] for i in validation], [targets[i] for i in test],
+    )

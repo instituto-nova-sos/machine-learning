@@ -35,3 +35,15 @@ def probability_to_class(probability: float, *, threshold: float = 0.5) -> int:
     if not math.isfinite(threshold) or not 0 <= threshold <= 1:
         raise ValueError("O limiar deve estar entre 0 e 1 e ser finito.")
     return int(probability >= threshold)
+
+
+def relu(score: float) -> float:
+    """Retorna max(0,z), uma ativação não linear que não é probabilidade.
+
+    ReLU significa unidade linear retificada (rectified linear unit). Valores
+    negativos viram zero; positivos passam sem limite superior. Em zero não há
+    derivada única; no backprop adotaremos a convenção zero. Rejeita não finitos.
+    """
+    if not math.isfinite(score):
+        raise ValueError("O escore deve ser finito.")
+    return max(0.0, score)
