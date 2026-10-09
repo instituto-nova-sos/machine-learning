@@ -46,6 +46,36 @@ def validate_scalers(scalers: list[StandardScaler1D]) -> None:
         raise ValueError("Artefato exige dois scalers finitos com escala positiva.")
 
 
+def _json_number(value: object) -> float:
+    """Aceita somente números JSON finitos, antes de convertê-los para float64.
+
+    bool é uma subclasse de int em Python, mas booleano JSON não é uma medida ou
+    peso. Strings como "1.0" também não satisfazem o esquema, mesmo que float()
+    consiga convertê-las. Inteiros e decimais são válidos; escala positiva e formas
+    são verificadas separadamente. Violações levantam ValueError.
+    """
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise ValueError("O artefato exige números JSON, sem strings ou booleanos.")
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("Os números do artefato devem ser finitos.")
+    return number
+
+
+def _validate_parameter_numbers(value: object) -> None:
+    """Verifica folhas numéricas das listas JSON antes da coerção do NumPy.
+
+    Matrizes de pesos e vetores de vieses têm listas aninhadas. O NumPy pode
+    transformar strings e booleanos em float64; essa conversão apagaria evidências
+    de um contrato inválido. A forma continua sendo validada contra a arquitetura.
+    """
+    if isinstance(value, list):
+        for item in value:
+            _validate_parameter_numbers(item)
+    else:
+        _json_number(value)
+
+
 def save_equipment_model(artifact: EquipmentArtifact, path: Path) -> None:
     """Salva versão 1, arquitetura fixa, ordem de colunas, scalers e parâmetros.
 
@@ -76,6 +106,7 @@ def load_equipment_model(path: Path) -> EquipmentArtifact:
 
     Aceita somente nosso esquema/arquitetura, com no máximo 1 MB. FileNotFoundError
     e erros de JSON são propagados; estrutura/números incompatíveis geram ValueError.
+    Scalers e parâmetros exigem números JSON finitos, sem coerção de bool ou str.
     O limite é proteção básica de recursos, não sandbox universal para arquivos hostis.
     """
     if path.stat().st_size > 1_000_000:
@@ -88,7 +119,7 @@ def load_equipment_model(path: Path) -> EquipmentArtifact:
     ):
         raise ValueError("Esquema, arquitetura ou ordem de colunas incompatíveis.")
     try:
-        scalers = [StandardScaler1D(float(s["media"]), float(s["escala"]))
+        scalers = [StandardScaler1D(_json_number(s["media"]), _json_number(s["escala"]))
                    for s in payload["scalers"]]
         validate_scalers(scalers)
         values = payload["parametros"]
@@ -96,6 +127,7 @@ def load_equipment_model(path: Path) -> EquipmentArtifact:
             raise ValueError("Forneça quatro arrays de parâmetros.")
         model = BinaryMLP.initialize()
         for target, source in zip(parameters(model), values, strict=True):
+            _validate_parameter_numbers(source)
             array: FloatArray = np.asarray(source, dtype=np.float64)
             if array.shape != target.shape or not np.all(np.isfinite(array)):
                 raise ValueError("Forma ou finitude de parâmetro incompatível.")

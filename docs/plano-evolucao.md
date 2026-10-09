@@ -67,5 +67,8 @@ reproduzidos em CPU. O adaptador Jev recebeu uma anotação TypeGuard compatíve
 os dois verificadores, mantendo sua validação offline.
 
 O registro completo em AGENTS.md distingue os ambientes de 2 e 9 de outubro.
-Os jobs Linux/Windows ainda precisam ser executados no GitHub; configurar a matriz
-não os torna testados. Jev live permanece opcional e não executado.
+Após abrir o PR #4, os 11 jobs da CI do commit 16e7ae7 passaram, incluindo os
+ambientes Linux/Windows. A revisão acrescentou testes de confiança Choice,
+números JSON sem coerção e preservação de threads, com 138 aprovados por ambiente
+local. Cada novo commit ainda exige seus próprios checks. Jev live permanece
+opcional e não executado.

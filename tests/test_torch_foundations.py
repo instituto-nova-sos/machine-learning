@@ -72,3 +72,26 @@ def test_training_backends_equivalent() -> None:
     assert automated.artifact.predict_proba([[80, 5]]) == pytest.approx(
         manual.artifact.predict_proba([[80, 5]]), abs=1e-12
     )
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_training_preserves_host_threads(monkeypatch: pytest.MonkeyPatch, fail: bool) -> None:
+    """Treino reutilizável preserva threads do hospedeiro, inclusive quando falha."""
+    from sos_ml.neural_training import train_equipment
+
+    original = torch.get_num_threads()
+    try:
+        torch.set_num_threads(2)
+        if fail:
+            def broken_step(*args, **kwargs):
+                raise RuntimeError("Falha de treino simulada.")
+
+            monkeypatch.setattr("sos_ml.torch_models.equipment.train_step", broken_step)
+            with pytest.raises(RuntimeError, match="simulada"):
+                train_equipment("torch", epochs=1)
+        else:
+            train_equipment("torch", epochs=1)
+        assert torch.get_num_threads() == 2
+    finally:
+        # O próprio teste também deve devolver a configuração original ao processo.
+        torch.set_num_threads(original)

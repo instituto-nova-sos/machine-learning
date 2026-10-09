@@ -69,26 +69,28 @@ somente planejamento.
 
 Um item só muda para **testado** depois de sua execução ser registrada neste arquivo.
 
-## Última validação: consolidação — 9 de outubro de 2026
+## Última validação: revisão do PR #4 — 9 de outubro de 2026
 
 Os testes foram executados em macOS ARM64 com ambientes separados do ambiente de trabalho:
 
 | Python | Dependências diretas da base | PyTorch CPU | Suíte final |
 |---|---|---|---|
-| 3.11.17 | NumPy 1.26.0, pandas 2.1.0, Matplotlib 3.8.0, Scikit-learn 1.4.0 | 2.10.0 | 119 aprovados |
-| 3.12.15 | NumPy 2.5.3, pandas 2.3.3, Matplotlib 3.11.2, Scikit-learn 1.9.1 | 2.14.1 | 119 aprovados |
+| 3.11.17 | NumPy 1.26.0, pandas 2.1.0, Matplotlib 3.8.0, Scikit-learn 1.4.0 | 2.10.0 | 138 aprovados |
+| 3.12.15 | NumPy 2.5.3, pandas 2.3.3, Matplotlib 3.11.2, Scikit-learn 1.9.1 | 2.14.1 | 138 aprovados |
 
 Ruff 0.6.0 e mypy 1.11.0 passaram no ambiente mínimo; Ruff 0.17.0 e mypy 1.20.2
 passaram no ambiente atual. Mypy verificou 39 fontes em ambos. O teste inicial da
 base sem PyTorch em Python 3.11 teve 115 aprovados e um módulo ignorado; a suíte
-de 119 foi executada depois de instalar a etapa PyTorch. Não confundir esse skip
-inicial com validação do extra.
+de 119 da consolidação foi executada depois de instalar a etapa PyTorch. A revisão
+do PR acrescentou 19 casos e aprovou 138 testes nos dois ambientes. Não confundir
+o skip inicial com validação do extra.
 
 O ambiente mínimo apresentou um aviso de depreciação de opções L-BFGS-B no
 Scikit-learn 1.4.0 com SciPy 1.16.3, sem falha. As restrições mínimas abrangem as
 dependências diretas da base e do grupo dev, não todas as transitivas ou o backend
-de construção. Linux/Windows ainda dependem da execução da CI configurada;
-configuração e parse de YAML não equivalem a executar esses sistemas.
+de construção. A CI do commit 16e7ae7 passou nos 11 jobs, incluindo base em
+Linux/macOS/Windows e ponte PyTorch CPU em Linux. A revisão posterior ainda exige
+conferir os checks de seu próprio commit; parse de YAML não comprova execução.
 
 Os registros de 2 de outubro abaixo são históricos. Consulte também o registro
 detalhado desta consolidação no final do arquivo.
@@ -576,3 +578,42 @@ aprovação. Não se instalou Python globalmente nem se substituiu a `.venv` de
 trabalho. Sem falhas nos caminhos finais; o aviso de depreciação do SciPy no
 Scikit-learn mínimo permanece explícito. Linux/Windows, mínimos de todas as
 transitivas e Jev live permanecem sem execução nesta máquina.
+
+## Revisão do PR #4 — 9 de outubro de 2026
+
+Três comentários de revisão foram atendidos sem mudar as APIs ou o esquema JSON:
+
+- Choice agora rejeita confidence incompatível com `(p_max−1/n)/(1−1/n)`, usando
+  tolerância absoluta 1e−6 para arredondamento. A fórmula foi reconferida na fonte
+  oficial https://docs.typesafe.ai/confidence, sem chamar o serviço Jev;
+- o carregador valida tipos numéricos JSON antes de float/NumPy: strings e bool
+  são recusados em médias, escalas, pesos e vieses; inteiros/decimais finitos
+  permanecem válidos. Formas e escala positiva continuam verificadas;
+- train_equipment não modifica threads globais. O ajuste para uma thread fica
+  nas CLIs dedicadas. Testes preservam duas threads do hospedeiro tanto em treino
+  bem-sucedido quanto em falha simulada.
+
+Foram acrescentados 19 casos de regressão, com 138 testes aprovados em Python
+3.11.17 (mínimos e torch 2.10.0) e 3.12.15 (atuais e torch 2.14.1). Ruff e mypy
+mínimos/atuais passaram; 39 fontes. make validate em 3.12 reproduziu geração,
+treino, avaliação e inferência, mais 12 blocos Python e 330 links locais válidos.
+make validate-torch aprovou seis testes e treino/recarga em processos separados;
+local_ai treinar --backend torch também preservou época 92, acurácia 0,775 e F1 0,7.
+Sem novos avisos; o aviso de depreciação do SciPy no ambiente mínimo permanece.
+
+A CI anterior (16e7ae7) passou nos 11 jobs da matriz de PR, incluindo Linux e
+Windows. As correções de revisão precisam dos checks do novo commit. Não houve
+integração Jev live, novos módulos pedagógicos ou migração do artefato versão 1.
+
+Comandos efetivamente executados, além da leitura das revisões e checks no GitHub:
+
+```bash
+/tmp/sos-ml-py312/bin/python -m pytest tests/test_jev_boundary.py tests/test_equipment_persistence.py tests/test_torch_foundations.py
+/tmp/sos-ml-py311-min/bin/python -m ruff check .
+MYPY_CACHE_DIR=/tmp/sos-pr4-min-mypy /tmp/sos-ml-py311-min/bin/python -m mypy
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-pr4-311-mpl XDG_CACHE_HOME=/tmp/sos-pr4-311-cache /tmp/sos-ml-py311-min/bin/python -m pytest
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-pr4-312-mpl XDG_CACHE_HOME=/tmp/sos-pr4-312-cache MYPY_CACHE_DIR=/tmp/sos-pr4-312-mypy PYTHONUTF8=1 PATH="/tmp/sos-ml-py312/bin:$PATH" make validate
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-pr4-312-mpl XDG_CACHE_HOME=/tmp/sos-pr4-312-cache PYTHONUTF8=1 PATH="/tmp/sos-ml-py312/bin:$PATH" make validate-torch
+/tmp/sos-ml-py312/bin/python -m sos_ml.local_ai treinar --backend torch --output /tmp/sos-pr4-cli-torch.json
+git diff --check
+```

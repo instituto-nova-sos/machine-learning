@@ -35,7 +35,9 @@ def parse_choice(payload: Mapping[str, object]) -> JevChoice:
     """Valida Choice bruto antes de uma política, ou levanta ValueError.
 
     Exige tipo choice, todas as três ações, soma de probabilidades próxima de 1
-    (tolerância 1e-6), valores [0,1] finitos e escolha entre máximos. Não autentica
+    (tolerância 1e-6), valores [0,1] finitos e escolha entre máximos. Verifica
+    confidence=(p_max−1/n)/(1−1/n), com tolerância absoluta 1e-6 para arredondamento
+    do provedor. Uma confiança incompatível não pode orientar a política. Não autentica
     origem nem comprova calibração: a fronteira valida contrato, não verdade.
     """
     choice = payload.get("choice")
@@ -67,6 +69,14 @@ def parse_choice(payload: Mapping[str, object]) -> JevChoice:
         or values[choice] < max(values.values())
     ):
         raise ValueError("Soma, escolha ou concentração incompatíveis.")
+    # A probabilidade máxima mede a opção; a concentração desconta o empate uniforme
+    # 1/n e reescala até 1. Para três opções e p_max=0,8, o resultado é 0,7.
+    # Validar apenas [0,1] permitiria que uma distribuição difusa alegasse confiança
+    # máxima e ultrapassasse indevidamente o limiar de revisão humana da política.
+    uniform = 1 / len(ACTIONS)
+    expected_confidence = (max(values.values()) - uniform) / (1 - uniform)
+    if not math.isclose(confidence, expected_confidence, rel_tol=0, abs_tol=1e-6):
+        raise ValueError("A concentração deve corresponder à distribuição de probabilidades.")
     return JevChoice(choice, values, float(confidence))
 
 

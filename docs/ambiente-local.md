@@ -99,10 +99,13 @@ Verificação local de 9 de outubro de 2026, em macOS ARM64:
 
 | Ambiente | Resultado da suíte |
 |---|---|
-| Python 3.11.17; base/dev nos mínimos; PyTorch 2.10.0 | 119 testes aprovados |
-| Python 3.12.15; base/dev atuais; PyTorch 2.14.1 | 119 testes aprovados |
+| Python 3.11.17; base/dev nos mínimos; PyTorch 2.10.0 | 138 testes aprovados |
+| Python 3.12.15; base/dev atuais; PyTorch 2.14.1 | 138 testes aprovados |
 
-Na base sem PyTorch, Python 3.11 aprovou 115 testes e ignorou explicitamente o
-módulo PyTorch. O ambiente mínimo emitiu um aviso de depreciação do SciPy usado
+Na consolidação inicial, sem PyTorch, Python 3.11 aprovou 115 testes e ignorou
+explicitamente o módulo PyTorch. A revisão do PR adicionou 19 casos. O ambiente
+mínimo emitiu um aviso de depreciação do SciPy usado
 pelo Scikit-learn 1.4, sem falhar. As duas execuções usam CPU; não comprovam
-compatibilidade com toda combinação de versões permitidas nem com Windows/Linux.
+compatibilidade com toda combinação de versões permitidas. A CI do commit
+16e7ae7 passou nos 11 jobs configurados, incluindo base Windows/Linux; os checks
+do commit de revisão devem ser conferidos separadamente no PR.

@@ -50,6 +50,42 @@ def test_invalid_artifact_parameters(tmp_path: Path, invalid: float) -> None:
         load_equipment_model(destination)
 
 
+@pytest.mark.parametrize("invalid", [True, False, "1.0"])
+@pytest.mark.parametrize("field", ["media", "escala", "peso", "vies"])
+def test_artifact_rejects_coerced_numbers(tmp_path: Path, field: str, invalid: object) -> None:
+    """JSON precisa conter números: conversão permissiva não valida o contrato."""
+    result = train_equipment(epochs=1)
+    destination = tmp_path / "mlp.json"
+    save_equipment_model(result.artifact, destination)
+    payload = json.loads(destination.read_text(encoding="utf-8"))
+    if field in ("media", "escala"):
+        payload["scalers"][0][field] = invalid
+    elif field == "peso":
+        payload["parametros"][0][0][0] = invalid
+    else:
+        payload["parametros"][1][0] = invalid
+    destination.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_equipment_model(destination)
+
+
+def test_artifact_accepts_json_integers(tmp_path: Path) -> None:
+    """Inteiros JSON são números válidos para escala, pesos e vieses float64."""
+    result = train_equipment(epochs=1)
+    destination = tmp_path / "mlp.json"
+    save_equipment_model(result.artifact, destination)
+    payload = json.loads(destination.read_text(encoding="utf-8"))
+    payload["scalers"][0] = {"media": 70, "escala": 2}
+    payload["parametros"][0][0][0] = 1
+    payload["parametros"][1][0] = 0
+    destination.write_text(json.dumps(payload), encoding="utf-8")
+    loaded = load_equipment_model(destination)
+    assert loaded.scalers[0].mean == 70.0
+    assert loaded.scalers[0].scale == 2.0
+    assert loaded.model.hidden.weights[0, 0] == 1.0
+    assert loaded.model.hidden.bias[0] == 0.0
+
+
 def test_restore_best_validation_state() -> None:
     """O artefato é o melhor estado, não o último ponto da curva de treino."""
     result = train_equipment(epochs=300, patience=20)

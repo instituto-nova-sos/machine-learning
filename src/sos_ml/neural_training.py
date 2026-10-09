@@ -32,6 +32,8 @@ def train_equipment(backend: Literal["numpy", "torch"] = "numpy", *,
     consecutivas sem melhora de pelo menos 1e-8. Históricos incluem estado inicial
     na posição zero. Teste nunca entra nos gradientes ou no critério de parada.
     NumPy é o caminho base; backend torch só importa biblioteca ao ser solicitado.
+    Não altera o número global de threads do PyTorch: esse ajuste de desempenho
+    pertence às CLIs, cujo processo é dedicado à demonstração, não ao hospedeiro.
     """
     if backend not in ("numpy", "torch"):
         raise ValueError("Backend deve ser numpy ou torch.")
@@ -45,7 +47,6 @@ def train_equipment(backend: Literal["numpy", "torch"] = "numpy", *,
 
         from .torch_models.equipment import EquipmentMLP, train_step
 
-        torch.set_num_threads(1)  # Redes minúsculas não precisam de várias threads.
         torch_model = EquipmentMLP()
         optimizer = torch.optim.SGD(torch_model.parameters(), lr=0.1)
     training = [model.loss(split.X_train, split.y_train)]

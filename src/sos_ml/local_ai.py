@@ -43,6 +43,13 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     if args.mode == "treinar":
+        if args.backend == "torch":
+            import torch
+
+            # A CLI usa um processo dedicado; a função reutilizável de treino não
+            # modifica threads do aplicativo que a importa. Uma thread é suficiente
+            # para esta rede minúscula e evita custo de paralelismo na demonstração.
+            torch.set_num_threads(1)
         result = train_equipment(args.backend)
         save_equipment_model(result.artifact, args.output)
         print(

@@ -54,6 +54,9 @@ O script sem flags usa **resposta fixa de teste (fixture) inventada**, não impo
 Ele mostra Choice sintética e revisão pela política. As probabilidades são sobre
 opções, nunca trocadas por p(falha) do classificador. Testes recusam tipos/ações,
 valores, distribuição e escolhas inválidos sem testar disponibilidade do serviço.
+O adaptador também confere se a confiança recebida corresponde à fórmula Choice
+da distribuição, com tolerância absoluta de 1e−6 para arredondamento. Uma resposta
+difusa não pode declarar confiança máxima e ultrapassar a política de revisão.
 
 Não adotamos pesos externos: as páginas oficiais consultadas documentam serviço
  e SDK, não estabelecem um pacote de pesos local com licença e requisitos verificados.
