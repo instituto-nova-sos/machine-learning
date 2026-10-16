@@ -47,6 +47,31 @@ def test_rules_reject_invalid_input(text: str) -> None:
 
 
 @pytest.mark.parametrize(
+    ("separator", "description_length", "extra_last_character"),
+    [("\n", 199, False), ("\n", 199, True), ("\r\n", 198, False)],
+)
+def test_line_breaks_preserve_valid_input_budget(
+    separator: str, description_length: int, extra_last_character: bool
+) -> None:
+    """Lotes válidos próximos de 2000 caracteres não crescem na normalização.
+
+    LF cobre 1999 e exatamente 2000 caracteres; CRLF cobre 1998 caracteres.
+    Cada descrição também respeita seu teto de 200. O resultado deve ser igual
+    ao das mesmas tarefas separadas por ponto e vírgula, sem truncar conteúdo.
+    """
+    descriptions = [
+        f"Estudar tarefa {index} ".ljust(description_length, "a") for index in range(10)
+    ]
+    if extra_last_character:
+        descriptions[-1] += "a"
+    text = separator.join(descriptions)
+    assert 1998 <= len(text) <= 2000
+    tasks = extract_by_rules(text)
+    assert tasks == extract_by_rules(";".join(descriptions))
+    assert [task.descricao for task in tasks] == descriptions
+
+
+@pytest.mark.parametrize(
     "value",
     [
         None,
@@ -130,6 +155,33 @@ def test_corrupt_csv_is_preserved(tmp_path: Path, content: str) -> None:
     with pytest.raises(ValueError):
         TaskStore(path).add([Task("Lavar roupa", "casa", "alta")])
     assert path.read_text(encoding="utf-8") == content
+
+
+@pytest.mark.parametrize(
+    "line", ['1,"Lavar roupa"x,casa,baixa,pendente', '1,"Lavar roupa,casa,baixa,pendente']
+)
+@pytest.mark.parametrize("operation", ["listar", "adicionar", "concluir"])
+def test_malformed_csv_quotes_are_rejected_without_rewriting(
+    tmp_path: Path, line: str, operation: str
+) -> None:
+    """Aspas malformadas não podem ser corrigidas silenciosamente pelo leitor.
+
+    Confere os bytes, incluindo CRLF, após leitura e tentativas de alteração.
+    ValueError mantém o contrato já tratado pela interface, sem deixar csv.Error
+    escapar ou trocar a descrição original por uma interpretação permissiva.
+    """
+    path = tmp_path / "tarefas.csv"
+    original = ("id,descricao,categoria,prioridade,status\r\n" + line + "\r\n").encode("utf-8")
+    path.write_bytes(original)
+    store = TaskStore(path)
+    with pytest.raises(ValueError, match="estrutura CSV inválida"):
+        if operation == "listar":
+            store.list_tasks()
+        elif operation == "adicionar":
+            store.add([Task("Estudar Python", "estudos", "média")])
+        else:
+            store.complete("1")
+    assert path.read_bytes() == original
 
 
 def test_atomic_write_failure_keeps_original(tmp_path: Path) -> None:

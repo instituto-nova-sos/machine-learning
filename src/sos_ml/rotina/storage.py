@@ -36,10 +36,22 @@ class TaskStore:
         if not self.path.exists():
             return []
         with self.path.open(newline="", encoding="utf-8") as stream:
-            reader = csv.DictReader(stream)
-            if reader.fieldnames != list(COLUMNS):
-                raise ValueError("Cabeçalho CSV inválido; preserve o arquivo e confira as colunas.")
-            rows = list(reader)
+            try:
+                # O modo permissivo aceita, por exemplo, texto depois de fechar
+                # aspas e pode mudar a descrição ao regravar. Exigimos sintaxe
+                # estrita antes de validar o significado de cada campo abaixo.
+                reader = csv.DictReader(stream, strict=True)
+                if reader.fieldnames != list(COLUMNS):
+                    raise ValueError(
+                        "Cabeçalho CSV inválido; preserve o arquivo e confira as colunas."
+                    )
+                rows = list(reader)
+            except csv.Error as error:
+                # A interface já trata ValueError. Não transforme um erro de
+                # leitura em lista vazia: add/complete devem preservar o arquivo.
+                raise ValueError(
+                    "O arquivo contém uma estrutura CSV inválida; preserve-o para inspeção."
+                ) from error
         ids = set()
         for row in rows:
             if set(row) != set(COLUMNS) or any(not isinstance(v, str) for v in row.values()):

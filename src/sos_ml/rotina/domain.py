@@ -83,4 +83,6 @@ def validate_input(text: str) -> str:
     if not isinstance(text, str) or len(text) > MAX_INPUT:
         raise ValueError("Escreva até 2000 caracteres.")
     # Quebras de linha são úteis na entrada, mas não ficam dentro de células CSV.
-    return clean_text(text.replace("\r\n", "\n").replace("\n", "; "), MAX_INPUT)
+    # Um separador vira outro sem acrescentar espaços: uma entrada que já cabe
+    # no orçamento de caracteres não deve ultrapassá-lo só pela normalização.
+    return clean_text(text.replace("\r\n", "\n").replace("\n", ";"), MAX_INPUT)

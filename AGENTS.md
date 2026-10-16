@@ -766,3 +766,33 @@ documental. Sem inferência Ollama real, máquina Windows, instalação via Stor
 validação de PowerShell nesta sessão; comandos Windows conferidos nas fontes,
 não apresentados como reproduzidos. Não se atribui causa específica às falhas
 relatadas pela turma sem a mensagem de erro original. Sem push ou merge.
+
+## Revisão do PR #5 — 16 de outubro de 2026
+
+Os dois comentários foram reproduzidos e considerados pertinentes:
+
+- `TaskStore._read` usa `csv.DictReader(strict=True)` e converte `csv.Error`
+  em `ValueError`, já tratado pela interface. Aspas malformadas bloqueiam leitura,
+  cadastro e conclusão sem regravar nem alterar os bytes do arquivo original;
+- `validate_input` normaliza LF para somente `;`, sem acrescentar espaço.
+  A normalização de CRLF continua preservada. Entradas válidas próximas e
+  exatamente no limite de 2000 caracteres não crescem ao normalizar.
+
+Foram acrescentados nove casos: seis combinações de aspas malformadas/operações
+CSV, conferindo bytes inclusive CRLF, e três lotes de dez tarefas perto do teto
+(LF com 1999/2000 caracteres e CRLF com 1998). Antes da correção, os casos
+reproduziram oito falhas; o caso CRLF já passava. Após o fix, a suíte completa
+aprovou **193 testes**, incluindo Gradio e PyTorch instalados, em macOS ARM64 com
+Python 3.14.8. Ruff e mypy (47 fontes) aprovados; `git diff --check` aprovado.
+Avisos de depreciação Gradio já registrados permanecem, sem falhas novas.
+
+Comandos executados: pytest focado com
+`-k 'line_breaks_preserve or malformed_csv_quotes'`, `.venv/bin/python -m pytest`
+com caches Matplotlib/Fontconfig em /tmp, `.venv/bin/python -m ruff check .`,
+`.venv/bin/python -m mypy` e `git diff --check`. APIs e esquema CSV preservados;
+nenhum dado pessoal ou inferência Ollama real foi utilizado.
+
+A CI do commit anterior f6ab1b4 foi conferida e passou nos 13 jobs de cada evento
+push/PR, incluindo base Windows e extra Gradio em Linux. Isso não reproduz a
+instalação/aliases das máquinas da turma. As correções desta revisão precisam
+aguardar os checks do próprio commit; não se presume CI aprovada para elas.
