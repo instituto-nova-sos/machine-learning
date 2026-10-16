@@ -13,3 +13,6 @@ data/processed/*.csv
 artifacts/*.pt
 artifacts/*.jsonl
 .env
+
+# Tarefas pessoais nunca entram no material compartilhado.
+data/rotina/

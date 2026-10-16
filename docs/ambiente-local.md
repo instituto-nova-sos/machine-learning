@@ -18,15 +18,122 @@ python -m pip install -e ".[dev]"
 
 ## Windows PowerShell
 
+### Primeiro identifique o Python instalado
+
+Não existe um nome de comando que funcione em toda instalação do Windows.
+Para a turma, confirme **Python 3.11 ou 3.12** antes de criar o ambiente:
+
 ```powershell
-py -3.11 -m venv .venv
-.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
+python --version
+python -c "import sys; print(sys.executable)"
 ```
 
-Se a política bloquear scripts, use uma sessão PowerShell comum e execute
-`Set-ExecutionPolicy -Scope Process RemoteSigned`; a alteração vale apenas para aquela sessão.
-Para sair do ambiente, execute `deactivate`. Não instale dependências globalmente.
+Se os dois comandos funcionarem e a versão for a recomendada, execute na raiz:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pytest
+```
+
+`-m venv` manda **esse interpretador** executar o módulo que cria o ambiente.
+A instalação e os testes seguintes usam explicitamente o Python da `.venv`.
+Não é necessário ativá-la: esse procedimento evita depender do launcher `py`
+e de permissão para executar o script `Activate.ps1`.
+Essa alternativa é documentada em [venv](https://docs.python.org/3/library/venv.html#how-venvs-work).
+
+### Se na máquina o comando for python3.exe
+
+Sua lembrança é compatível com instalações existentes: a documentação do
+[Python 3.11 distribuído pela Microsoft Store](https://docs.python.org/3.11/using/windows.html#the-microsoft-store-package)
+descreve nomes como `python.exe`, `python3.exe` e `python3.11.exe`.
+Se `python` falhar, confira o candidato antes de criar a pasta:
+
+```powershell
+python3.exe --version
+python3.exe -c "import sys; print(sys.executable)"
+```
+
+**Somente se confirmar a versão desejada**, crie com:
+
+```powershell
+python3.exe -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+```
+
+`python3.exe` não é um substituto garantido em todo Windows. Depois da criação,
+continue usando `.\.venv\Scripts\python.exe`: chamar `python3.exe` novamente pode
+selecionar a instalação global, mesmo quando você pretendia usar o ambiente.
+
+### Por que py -3.11 pode falhar?
+
+`py` é um seletor/gerenciador, diferente do interpretador `python.exe`.
+O comando `py -3.11 -m venv .venv` é válido, mas precisa encontrar o comando `py`
+e uma instalação 3.11 utilizável. Ele não significa “use qualquer Python 3”.
+O [launcher tradicional](https://docs.python.org/3.11/using/windows.html#python-launcher-for-windows)
+e o [Python Install Manager atual](https://docs.python.org/3/using/windows.html#basic-use)
+têm recursos diferentes. Por isso, deixamos `py` como alternativa, não como
+pré-requisito das aulas. A falha relatada na turma não foi reproduzida aqui;
+sem a mensagem original, não podemos atribuí-la a uma causa específica.
+
+### Diagnosticar sem adivinhar o caminho
+
+No PowerShell, liste os comandos encontrados com
+[Get-Command](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/get-command):
+
+```powershell
+Get-Command python, python3, py -All -ErrorAction SilentlyContinue
+where.exe python
+where.exe python3
+```
+
+[where.exe](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/where)
+procura executáveis no caminho de busca; use a extensão, pois `where`
+no PowerShell também pode designar outro comando. Nome encontrado não basta:
+`--version` e `sys.executable` confirmam o interpretador que realmente executou.
+
+| Sintoma | O que conferir |
+|---|---|
+| `py` não reconhecido | comando ausente ou fora do PATH; use o interpretador confirmado |
+| `py -3.11` não encontra Python | 3.11 pode não estar instalado/visível para esse seletor |
+| `python` abre a Store ou informa que não foi encontrado | pode ser um alias de instalação, não um runtime funcional |
+| Versão diferente de 3.11/3.12 | localize a versão do curso antes de criar a `.venv` |
+| Instalação recente não aparece no terminal | reabra o terminal e repita a identificação |
+
+Nos **aliases de execução de aplicativo** do Windows, confira a associação de
+`python.exe`/`python3.exe`. Não desative todos os aliases indiscriminadamente:
+o Install Manager atual também usa esse mecanismo. A orientação depende do que
+foi instalado; veja a [solução de problemas oficial](https://docs.python.org/3/using/windows.html#troubleshooting).
+
+Se já conhece o caminho real do interpretador correto, pode usá-lo diretamente.
+O exemplo abaixo tem caminho ilustrativo: substitua pelo caminho da sua máquina.
+No PowerShell, `&` executa um caminho entre aspas, como explica a
+[documentação de operadores](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_operators#call-operator-).
+
+```powershell
+& "C:\caminho\do\Python312\python.exe" --version
+& "C:\caminho\do\Python312\python.exe" -m venv .venv
+```
+
+### Ativação é opcional
+
+Para usar os exemplos escritos como `python ...`, ative no PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -c "import sys; print(sys.executable)"
+```
+
+O caminho exibido deve estar dentro da `.venv` deste projeto. Para sair, use
+`deactivate`. Se a política bloquear o script, continue com
+`.\.venv\Scripts\python.exe` em lugar de `python`, sem alterar a política da máquina.
+No Prompt de Comando (`cmd.exe`), o script de ativação é
+`.venv\Scripts\activate.bat`; não misture os dois shells.
+
+Pesquisa em fontes oficiais em **16 de outubro de 2026**. Estas instruções foram
+revisadas documentalmente; não foram executadas em uma máquina Windows nesta
+sessão. CI com Python já provisionado não verifica instalação, PATH ou aliases
+nos computadores dos alunos.
 
 ## Etapas PyTorch e Jev
 

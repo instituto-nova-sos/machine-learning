@@ -1,0 +1,102 @@
+/* Apresentação separada do Python: o fluxo didático não depende deste tema.
+   Cores usam variáveis para respeitar o modo claro/escuro do navegador. */
+:root {
+    --routine-accent: #15705c;
+    --routine-soft: #edf5f0;
+    --routine-muted: #61736d;
+}
+.gradio-container {max-width: 1440px !important; margin: auto !important; padding: 0 !important;}
+footer {display: none !important;}
+#routine-shell {gap: 0; min-height: 100vh; background: var(--background-fill-primary);}
+#routine-sidebar {
+    padding: 32px 22px; background: var(--background-fill-secondary);
+    border-right: 1px solid var(--border-color-primary); gap: 22px;
+    flex-grow: 1; max-width: 280px;
+}
+.brand {display: flex; gap: 12px; align-items: center; font-size: 16px; font-weight: 700;}
+.brand-icon {display: grid; place-items: center; width: 40px; height: 40px;
+    border-radius: 13px; background: #15705c; color: white; font-size: 26px;}
+.brand small {display: block; letter-spacing: .18em; font-size: 9px; margin-top: 4px; opacity: .6;}
+#new-conversation {border-radius: 12px; min-height: 44px; text-align: left;}
+.sidebar-copy p {font-size: 14px !important; line-height: 1.65; opacity: .7;}
+.local-note {font-size: 12px; margin-top: 28px; color: var(--body-text-color-subdued);}
+.local-note p {margin: 8px 0 0 14px; font-size: 11px;}
+.status-dot {display: inline-block; width: 6px; height: 6px; background: #37a583;
+    border-radius: 50%; margin-right: 8px;}
+#routine-main {padding: 24px 40px 28px; gap: 16px; max-width: 1080px; margin: auto;}
+.topbar {display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: .13em; color: var(--body-text-color-subdued);}
+.local-badge {font-weight: 400; letter-spacing: 0; font-size: 11px;}
+.routine-stats {display: flex; gap: 24px; padding: 8px 0; font-size: 12px;
+    color: var(--body-text-color-subdued); flex-wrap: wrap;}
+.routine-stats b {font-size: 17px; color: var(--body-text-color); margin-right: 4px;}
+#routine-chat {border: 0; background: transparent; box-shadow: none;}
+#routine-chat .wrapper {border: 0;}
+#routine-chat .message {font-size: 14px; line-height: 1.7;}
+.chat-welcome {text-align: center; padding: 45px 12px; color: var(--body-text-color);}
+.welcome-icon {display: block; font-size: 38px; color: #38a384; margin-bottom: 18px;}
+.chat-welcome h1 {font-size: clamp(24px, 3vw, 34px); font-weight: 600; letter-spacing: -.04em;
+    line-height: 1.2; margin: 0 0 14px;}
+.chat-welcome p {font-size: 14px; line-height: 1.7; color: var(--body-text-color-subdued);}
+#suggestion-chips {gap: 8px;}
+#suggestion-chips button {font-size: 12px; border-radius: 12px; padding: 10px 12px;
+    min-height: 42px; font-weight: 400; box-shadow: none;}
+#routine-composer {border-radius: 20px; padding: 10px 14px; box-shadow: 0 4px 20px #00000006;
+    border: 1px solid var(--border-color-primary); background: var(--block-background-fill);}
+#routine-composer textarea {border: 0 !important; background: transparent !important;
+    box-shadow: none !important; font-size: 14px; padding: 12px 4px;}
+#routine-composer > .form {border: 0;}
+#routine-composer button {border-radius: 12px;}
+#composer-hint {align-self: center; min-width: 140px;}
+#composer-hint p, .microcopy p {font-size: 11px !important;
+    color: var(--body-text-color-subdued); line-height: 1.6;}
+#routine-feedback {border: 0; background: transparent; box-shadow: none;}
+#routine-feedback textarea {font-size: 12px; line-height: 1.6;}
+.task-list {display: grid; gap: 10px; margin: 16px 0;}
+.task-card {display: flex; gap: 14px; align-items: flex-start; padding: 18px;
+    border: 1px solid var(--border-color-primary); border-radius: 14px;
+    background: var(--block-background-fill);}
+.task-marker {font-size: 22px; color: #379981; line-height: 1.2;}
+.task-card h3 {font-size: 14px; font-weight: 500; line-height: 1.5; margin: 0 0 10px;
+    color: var(--body-text-color); overflow-wrap: anywhere;}
+.task-card.done h3 {text-decoration: line-through; color: var(--body-text-color-subdued);}
+.task-meta {display: flex; gap: 8px; flex-wrap: wrap; font-size: 10px;
+    color: var(--body-text-color-subdued);}
+.task-meta span {border-radius: 6px; padding: 3px 8px; background: var(--background-fill-secondary);}
+.task-meta .priority-high {background: #fff0dc; color: #8a4b00;}
+.empty-tasks {text-align: center; padding: 48px 20px; color: var(--body-text-color-subdued);}
+.empty-tasks > span {font-size: 36px; color: #379981;}
+.empty-tasks h3 {font-size: 17px; margin-top: 12px;}
+.empty-tasks p {font-size: 13px; line-height: 1.7;}
+#complete-task {padding: 16px; border-radius: 14px;}
+#task-filters {gap: 10px;}
+button:focus-visible, textarea:focus-visible {outline: 2px solid #38a384 !important;
+    outline-offset: 3px;}
+@media (max-width: 780px) {
+    #routine-shell {flex-direction: column;}
+    #routine-sidebar {max-width: none; width: 100%; min-width: 0 !important;
+        padding: 16px 20px; border-right: 0; border-bottom: 1px solid var(--border-color-primary);}
+    #routine-sidebar .sidebar-copy, .local-note {display: none;}
+    #routine-main {padding: 18px 16px; min-width: 0 !important; width: 100%; box-sizing: border-box;}
+    .topbar {flex-wrap: wrap;}
+    #routine-chat {height: 340px !important;}
+    .chat-welcome {padding: 32px 6px;}
+    .routine-stats {gap: 14px;}
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {scroll-behavior: auto !important; animation-duration: 0s !important;}
+}
+/* O contêiner padrão do Gradio encolhe conforme o conteúdo; a demo ocupa a janela. */
+.gradio-container {width: 100% !important;}
+.gradio-container main {width: 100% !important; max-width: none !important; padding: 0 !important;}
+#routine-shell {align-items: stretch;}
+#routine-sidebar {align-self: stretch; box-sizing: border-box; overflow-x: hidden;}
+#routine-sidebar .block, #routine-sidebar .form {min-width: 0 !important;}
+#routine-feedback p, #task-feedback p {font-size: 12px; line-height: 1.6;
+    color: var(--body-text-color-subdued);}
+#routine-feedback:has(.prose:empty) {display: none;}
+#routine-chat .bubble-wrap {background: transparent;}
+#routine-composer .row {background: transparent;}
+@media (min-width: 781px) {
+    #routine-sidebar {min-height: 100vh;}
+}

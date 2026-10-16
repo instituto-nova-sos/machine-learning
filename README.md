@@ -599,9 +599,14 @@ python -m pip install -e ".[dev]"
 
 ### Windows PowerShell
 
+Confirme Python 3.11 ou 3.12 antes de criar o ambiente. Se `python` não funcionar,
+identifique o executável pelo [guia de Windows](docs/ambiente-local.md#windows-powershell);
+ele explica `python3.exe`, `py` e a alternativa sem ativação.
+
 ```powershell
-py -3.11 -m venv .venv
-.venv\Scripts\Activate.ps1
+python --version
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"
 ```
@@ -739,3 +744,23 @@ ser local e **o modelo é apenas um componente do sistema**.
 ### Continuação: Projeto integrador
 
 [Projeto integrador](projeto-integrador/README.md): Fluxo local completo de sensores sintéticos até modelo, artefato, inferência, decisão, política, revisão e registro; rubrica de 100 pontos e soluções separadas.
+
+### Aplicação cotidiana em duas aulas: Meu Assistente de Rotina
+
+[Meu Assistente de Rotina](projeto-integrador/assistente-rotina/README.md) oferece
+uma prática adicional para Python básico em exatamente dois encontros de duas
+horas: interface Gradio em português, regras explícitas, classificador de texto
+Scikit-learn e extração por Ollama com Qwen3 1.7B (alternativa 0.6B). Sugestões
+passam por validação e revisão antes do CSV local. Funciona também sem Ollama.
+
+Na raiz, com a `.venv` ativada:
+
+```bash
+python -m pip install -e ".[dev,rotina]"
+python -m sos_ml.rotina.app
+```
+
+Abra `http://127.0.0.1:7860`. As instruções de instalação do Ollama, planos das
+duas aulas, exercícios, personalizações e uso em computadores modestos estão no
+guia. Os dados pessoais ficam em `data/rotina/`, ignorado pelo Git. Esta prática
+tem rubrica própria e preserva a trilha matemática e o projeto de sensores.

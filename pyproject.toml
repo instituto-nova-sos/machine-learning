@@ -22,12 +22,15 @@ dev = ["pytest>=8,<9", "ruff>=0.6,<1", "mypy>=1.11,<2"]
 torch = ["torch>=2.10,<3"]
 # Integração remota opcional: não participa das atividades obrigatórias.
 jev = ["typesafe-sdk==0.7.2"]
+# Interface opcional do projeto de rotina; Ollama usa a biblioteca padrão HTTP.
+rotina = ["gradio>=5.49,<6"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 sos_ml = ["py.typed"]
+"sos_ml.rotina" = ["exemplos.csv", "localizacao.js", "interface.css"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

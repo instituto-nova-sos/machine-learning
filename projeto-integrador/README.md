@@ -2,6 +2,16 @@
 
 [← Engenharia](../engenharia-de-ml/README.md) · [Trilha](../docs/jornada-de-aprendizado.md)
 
+## Prática adicional em duas aulas: Meu Assistente de Rotina
+
+Para uma aplicação cotidiana com Python básico, siga o
+[Meu Assistente de Rotina](assistente-rotina/README.md): Gradio, regras, pequeno
+classificador Scikit-learn, extração local com Ollama/Qwen3 e CSV com revisão.
+São dois encontros de 120 minutos, com caminho completo sem Ollama e rubrica
+própria. O projeto de sensores e seus requisitos continuam descritos abaixo.
+
+## Projeto de sensores
+
 Objetivo: integrar fundamentos e software em uma aplicação local pequena.
 Você já conhece temperatura/vibração, logística, escalas e falha nas próximas
 24 horas. Agora percorra dados → MLP → artefato → inferência → decisão → política.

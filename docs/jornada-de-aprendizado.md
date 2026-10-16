@@ -49,6 +49,14 @@ ilustrações, não novos benchmarks independentes ou evidência industrial.
 O modelo é um componente. Dados, software, avaliação, política, incerteza,
 segurança, observabilidade e responsabilidade humana completam o sistema.
 
+Como prática adicional de Python básico, o
+[Meu Assistente de Rotina](../projeto-integrador/assistente-rotina/README.md)
+tem exatamente duas aulas de 120 minutos. Começa com regras, conta palavras antes
+de usar Scikit-learn e só então apresenta extração local com Ollama/Qwen3,
+validação, revisão e CSV. O percurso sem Ollama permite participar em máquinas
+modestas. É uma aplicação cotidiana com rubrica própria, sem substituir as
+competências matemáticas ou o projeto de sensores da trilha acima.
+
 - [Engenharia de ML](../engenharia-de-ml/README.md): Contratos versionados, pré-processamento persistido, observabilidade JSONL, reprodutibilidade, segurança de artefatos e responsabilidade humana.
 
 - [Projeto integrador](../projeto-integrador/README.md): Fluxo local completo de sensores sintéticos até modelo, artefato, inferência, decisão, política, revisão e registro; rubrica de 100 pontos e soluções separadas.

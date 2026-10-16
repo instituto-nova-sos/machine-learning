@@ -22,7 +22,7 @@ avaliação e sistemas de ML — não apenas operar notebooks, APIs ou chamadas 
 
 ## Estado atual
 
-Última atualização registrada: **9 de outubro de 2026**.
+Última atualização registrada: **16 de outubro de 2026**.
 
 A trilha foi implementada até o projeto integrador, com execução local das práticas:
 
@@ -66,6 +66,7 @@ somente planejamento.
 | Jev / System One | revisado e testado offline | fontes oficiais e fixture; integração live não executada |
 | Engenharia de ML educacional | testado | contrato de artefato, CLI e registro JSONL; não é produção completa |
 | Projeto integrador e rubrica | testado | fluxo local completo e rubrica de 100 pontos |
+| Meu Assistente de Rotina | testado sem Ollama real | regras/ML, contratos HTTP simulados, CSV e eventos Gradio; duas aulas de 120 minutos |
 
 Um item só muda para **testado** depois de sua execução ser registrada neste arquivo.
 
@@ -617,3 +618,151 @@ MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-pr4-312-mpl XDG_CACHE_HOME=/tmp/sos-pr4-312
 /tmp/sos-ml-py312/bin/python -m sos_ml.local_ai treinar --backend torch --output /tmp/sos-pr4-cli-torch.json
 git diff --check
 ```
+
+
+## Meu Assistente de Rotina — 16 de outubro de 2026
+
+Branch local `feat/meu-assistente-rotina`, criada a partir de `main` limpo.
+Inspeção anterior às edições: instruções, README, jornada, plano de evolução,
+metodologia, projeto integrador de sensores, pacote, CLIs, dados, configuração,
+verificador documental e testes. Base anterior: 138 testes aprovados, Ruff e
+mypy (39 fontes) aprovados. Nenhum material anterior foi substituído.
+
+Aplicação adicional em `src/sos_ml/rotina/`, documentação em
+`projeto-integrador/assistente-rotina/`. Dois encontros de exatamente 120 minutos
+com pausas, exercícios em níveis, soluções separadas, rubrica própria, seis
+contextos de personalização e percurso para poucos recursos. A preparação do
+ambiente ocorre antes das aulas; a aplicação é fornecida para estudo/modificação.
+A trilha matemática e a rubrica dos sensores permanecem válidas.
+
+Decisões implementadas:
+
+- extra `rotina` com Gradio >=5.49,<6; base e PyTorch preservados;
+- regras em Python puro antes de contagens/Naive Bayes; categorias fechadas;
+- 42 exemplos fictícios de treino e 14 de teste explícitos no CSV empacotado;
+  vocabulário ajustado só no treino, sem usar tarefas pessoais para aprender;
+- Ollama por HTTP loopback sem SDK/proxy, Qwen3 1.7B padrão e 0.6B alternativo;
+  esquema JSON, think=False, stream=False, saída limitada e timeout por I/O;
+- contrato comum para LLM, regras, edição da revisão e persistência; lote inválido
+  não é parcialmente salvo. Falha de rede/contrato aciona regras com aviso;
+- revisão explícita antes de salvar, lista e filtros por categoria/status/prioridade,
+  conclusão por ID estável e prevenção de duplicata pendente por descrição;
+- CSV UTF-8 em data/rotina/ ignorado pelo Git, IDs validados, escrita atômica,
+  lock no processo, arquivo corrompido preservado. Não há coordenação multiprocesso;
+- Gradio em 127.0.0.1 sem compartilhamento público/analytics; fontes do sistema;
+  adaptador JS localizado para controles internos de tabelas do Gradio 5;
+- novos alvos run-routine/validate-routine e jobs de CI com extra em Python 3.11/3.12.
+  CI somente configurada; não executada remotamente nesta etapa. Sem push/merge.
+
+Validação efetivamente executada em macOS ARM64, Python 3.14.8, Scikit-learn
+1.9.1 e Gradio 5.50.0:
+
+- `make validate`: Ruff aprovado, mypy 47 fontes, **183 testes aprovados**
+  (138 anteriores + 45 novos), práticas anteriores reproduzidas, 12 blocos Python
+  e 364 links locais sem destino ausente;
+- `make validate-routine`: 45 testes aprovados, incluindo eventos reais registrados
+  no Gradio sem iniciar rede; classificador 14/14 no teste pequeno inventado,
+  baseline constante 2/14. Não é evidência de desempenho geral;
+- validação via Chrome com CSV temporário: analisar duas tarefas, editar prioridade
+  para baixa, confirmar, filtrar estudos, concluir ID 2 e recarregar;
+- `pip check` sem conflitos; `git diff --check` aprovado;
+- geração imobiliária, treino, avaliação e inferência preservaram RMSE 18603,65 e
+  previsão 350577,02; logística preservou 64/80; MLP preservou época 92 e F1 0,7.
+
+Comandos realmente executados na raiz:
+
+```bash
+.venv/bin/python -m pytest
+.venv/bin/python -m ruff check .
+.venv/bin/python -m mypy
+.venv/bin/python -m pip install -e '.[dev,rotina]'
+.venv/bin/python -m pytest tests/test_rotina.py tests/test_rotina_ui.py
+.venv/bin/python -m sos_ml.rotina.classifier
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-rotina-mpl XDG_CACHE_HOME=/tmp/sos-rotina-cache MYPY_CACHE_DIR=/tmp/sos-rotina-mypy PATH="$PWD/.venv/bin:$PATH" make validate
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-rotina-mpl XDG_CACHE_HOME=/tmp/sos-rotina-cache PATH="$PWD/.venv/bin:$PATH" make validate-routine
+MPLBACKEND=Agg MPLCONFIGDIR=/tmp/sos-rotina-mpl XDG_CACHE_HOME=/tmp/sos-rotina-cache .venv/bin/python -m sos_ml.rotina.app --csv /tmp/sos-rotina-ui-final.csv --port 7864
+.venv/bin/python -m pip check
+git diff --check
+```
+
+Instalação no PyPI e abertura de porta local falharam no sandbox e foram
+reexecutadas com aprovação. A primeira importação Gradio sem cache configurado
+emitiu avisos Matplotlib/Fontconfig; execuções posteriores usaram caches em /tmp.
+Gradio 5.50 emitiu avisos de APIs a remover no 6; o extra limita a versão a <6.
+Os ambientes Python 3.11/3.12 históricos de /tmp não estavam executáveis nesta
+sessão: não se afirma nova validação nessas versões ou dos mínimos do extra.
+
+Ollama não estava instalado: contrato HTTP, JSON válido/inválido, timeout,
+servidor ausente e fallback foram simulados em testes, sem inferência Qwen3 real.
+Os comandos e tags foram conferidos em fontes oficiais, com referências no guia.
+Permanecem limites: regras sem negação, treino fictício pequeno, potencial invenção
+pelo LLM, CSV sem criptografia/backup automático ou acesso multiusuário. Sem falhas
+conhecidas nos caminhos executados. Nenhuma tarefa pessoal foi publicada.
+
+
+## Revisão de UX do assistente — 16 de outubro de 2026
+
+A mesma branch local ganhou uma experiência de conversa: boas-vindas, sugestões
+rápidas, compositor de mensagens, histórico de sessão limitado a 24 mensagens,
+revisão contextual e confirmação de salvamento na conversa. A lateral reúne
+configurações recolhíveis e Nova conversa. A aba Minhas tarefas apresenta cartões,
+contadores gerais e conclusão pela seleção do nome, mantendo o ID interno.
+Comparação didática e tabela CSV continuam em painéis recolhíveis. CSS foi
+separado em interface.css, incluído nos recursos do pacote, com regras para telas
+estreitas, foco visível e redução de movimento. Avisos possuem região acessível.
+
+Cada mensagem continua sendo interpretada individualmente: o histórico visual não
+é enviado ao LLM, não vira memória de contexto e não é persistido. Nova conversa
+ou limpar o chat descarta só a sessão/revisão, preserva CSV e abre a aba Conversa.
+Revisão, validação, fallback e confirmação continuam obrigatórios. Textos dos
+cartões são escapados antes de virar HTML; chat apresenta texto sem Markdown.
+Roteiros e solução de problemas foram atualizados para os novos controles,
+preservando exatamente duas aulas de 120 minutos.
+
+Execuções nesta revisão: pytest completo com **184 aprovados** (um caso novo de
+escape HTML/estado vazio); teste de eventos da UI atualizado cobre conversa,
+edição, salvamento, filtros, seleção por nome, conclusão, erros e nova conversa.
+Ruff e mypy (47 fontes) aprovados. Verificador documental: 12 blocos e 365 links
+locais válidos. Navegador Chrome: boas-vindas, sugestão rápida, envio, revisão,
+confirmação, cartões e conclusão pelo nome conferidos visualmente em CSV temporário.
+O núcleo de ML e o armazenamento não foram modificados nesta revisão.
+
+Comandos executados: `.venv/bin/python -m pytest`, pytest focado nos arquivos
+`tests/test_rotina.py` e `tests/test_rotina_ui.py`, Ruff, mypy, verificador de
+material com caches em /tmp, `git diff --check` e servidor local na porta 7864.
+Permanecem os avisos de depreciação Gradio 5 e a ausência de inferência Ollama real.
+Sem push ou merge; sem nova validação em Python 3.11/3.12 ou execução remota da CI.
+
+
+## Documentação dos parâmetros LLM e Windows — 16 de outubro de 2026
+
+`src/sos_ml/rotina/llm.py` documenta o prompt e cada campo da requisição:
+model, stream, think, format, messages/system/user, temperature, num_predict e
+num_ctx. As explicações conectam previsão de tokens, softmax/logits, Transformer,
+inferência com pesos fixos, consumo de recursos e validação/revisão aos módulos
+existentes. Diferenciam temperatura de geração de taxa de aprendizado e dos °C
+no exemplo de sensores; tokens de caracteres/palavras; contexto de memória de
+conversa persistente. Valores e comportamento da requisição foram preservados.
+
+Pesquisa nas fontes oficiais Python 3.11 e documentação atual, Microsoft
+PowerShell/Windows e Ollama: `py -3.11` é válido, mas depende do comando launcher
+ou gerenciador e de uma instalação 3.11 utilizável. `python3.exe` existe em algumas
+instalações, incluindo a distribuição tradicional da Microsoft Store, mas não é
+nome universal. O guia passa a identificar versão/executável antes de criar a
+venv e oferece instalação/execução por `.\.venv\Scripts\python.exe`, sem ativação.
+Inclui diagnóstico de PATH/aliases, distinção entre gerenciador atual e launcher
+antigo e exemplo de caminho explícito com operador & no PowerShell.
+
+README raiz, guia do assistente e solução de problemas apontam para o diagnóstico
+em docs/ambiente-local.md. A criação principal não depende mais de `py -3.11`.
+A recomendação Python 3.11/3.12 foi preservada. A instrução de mudar política de
+execução foi substituída pelo uso direto do interpretador do ambiente.
+
+Validação executada: Ruff aprovado; mypy 47 fontes aprovado; pytest do núcleo do
+assistente, **44 aprovados**. Verificador de material executado com caches /tmp;
+links e blocos conferidos. `git diff --check` aprovado. A suíte completa de 184
+é o resultado da revisão de UX anterior, não uma nova execução desta alteração
+documental. Sem inferência Ollama real, máquina Windows, instalação via Store ou
+validação de PowerShell nesta sessão; comandos Windows conferidos nas fontes,
+não apresentados como reproduzidos. Não se atribui causa específica às falhas
+relatadas pela turma sem a mensagem de erro original. Sem push ou merge.
