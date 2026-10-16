@@ -1,0 +1,57 @@
+texto,categoria,particao
+pagar boleto de energia,finanças,treino
+conferir conta do banco,finanças,treino
+anotar gastos no orçamento,finanças,treino
+separar dinheiro para aluguel,finanças,treino
+organizar despesas do mês,finanças,treino
+registrar pagamento da internet,finanças,treino
+estudar matemática para prova,estudos,treino
+revisar exercício do curso,estudos,treino
+ler capítulo para aula,estudos,treino
+resolver atividade de Python,estudos,treino
+assistir aula de programação,estudos,treino
+preparar resumo de história,estudos,treino
+enviar currículo para vaga,emprego,treino
+preparar entrevista de emprego,emprego,treino
+buscar oportunidade de trabalho,emprego,treino
+atualizar currículo profissional,emprego,treino
+acompanhar candidatura à vaga,emprego,treino
+treinar apresentação para recrutador,emprego,treino
+conferir estoque da loja,negócio,treino
+responder cliente sobre venda,negócio,treino
+solicitar produtos ao fornecedor,negócio,treino
+organizar pedidos do comércio,negócio,treino
+calcular preço para cliente,negócio,treino
+preparar entrega da loja,negócio,treino
+limpar cozinha da casa,casa,treino
+lavar roupa e toalhas,casa,treino
+comprar alimentos no mercado,casa,treino
+arrumar quarto e sala,casa,treino
+varrer quintal de casa,casa,treino
+organizar armário da cozinha,casa,treino
+separar doação para comunidade,voluntariado,treino
+organizar campanha da ong,voluntariado,treino
+participar do mutirão voluntário,voluntariado,treino
+recolher doações de alimentos,voluntariado,treino
+ajudar associação comunitária,voluntariado,treino
+planejar ação de solidariedade,voluntariado,treino
+caminhar no parque,outros,treino
+telefonar para amigo,outros,treino
+ouvir música e descansar,outros,treino
+visitar exposição de arte,outros,treino
+regar planta da varanda,outros,treino
+marcar passeio de bicicleta,outros,treino
+pagar conta de água,finanças,teste
+registrar despesas de transporte,finanças,teste
+estudar Python para atividade,estudos,teste
+revisar resumo para prova,estudos,teste
+enviar candidatura de emprego,emprego,teste
+preparar currículo para recrutador,emprego,teste
+responder pedido do cliente,negócio,teste
+conferir entrega do fornecedor,negócio,teste
+lavar toalhas da casa,casa,teste
+arrumar armário do quarto,casa,teste
+organizar doações para ong,voluntariado,teste
+ajudar no mutirão da comunidade,voluntariado,teste
+caminhar com amigo no parque,outros,teste
+ouvir música na varanda,outros,teste

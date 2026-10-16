@@ -99,3 +99,24 @@ jobs:
         run: |
           python -m pip check
           make validate-torch
+
+  rotina:
+    name: Assistente de rotina / Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Instalar interface opcional
+        run: python -m pip install -e '.[dev,rotina]'
+      - name: Verificar núcleo e eventos Gradio sem Ollama
+        run: |
+          python -m pip check
+          make validate-routine

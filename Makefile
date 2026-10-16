@@ -54,3 +54,14 @@ validate-material: run-local-ai
 	python scripts/verificar_material.py
 
 validate: validate-material
+
+.PHONY: run-routine validate-routine
+
+# Exige extra rotina; o núcleo e seus testes continuam disponíveis na base.
+run-routine:
+	python -m sos_ml.rotina.app
+
+validate-routine:
+	python -c "import gradio; print('Gradio instalado:', gradio.__version__)"
+	python -m pytest tests/test_rotina.py tests/test_rotina_ui.py
+	python -m sos_ml.rotina.classifier
