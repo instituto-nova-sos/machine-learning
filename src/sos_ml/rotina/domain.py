@@ -13,6 +13,11 @@ CATEGORIES = (
     "negócio",
     "casa",
     "voluntariado",
+    "hobby",
+    "saúde",
+    "família",
+    "espiritual",
+    "projeto",
     "outros",
 )
 PRIORITIES = ("alta", "média", "baixa")
